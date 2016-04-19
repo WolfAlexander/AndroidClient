@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AndroidClient</string>
+    <string name="action_settings">Settings</string>
+    <string name="AppName">App name</string>
+</resources>

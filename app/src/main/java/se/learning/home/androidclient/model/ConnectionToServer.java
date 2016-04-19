@@ -1,0 +1,126 @@
+package se.learning.home.androidclient.model;
+
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
+import javax.net.SocketFactory;
+
+import DTO.ClientServerTransferObject;
+import DTO.Devices;
+import DTO.GetDataRequest;
+import DTO.ServerData;
+
+/**
+ * Singelton class that handles connection and conversation to server
+ */
+public class ConnectionToServer implements Runnable{
+    private static ConnectionToServer serverInstance = new ConnectionToServer();
+    private ServerData serverData;
+    private Socket connection;
+    private ObjectOutputStream outputStream;
+    private ObjectInputStream inputStream;
+
+    private ConnectionToServer(){}
+
+    /**
+     * @return the only instance of this class
+     */
+    public static ConnectionToServer getInstance(){
+        return serverInstance;
+    }
+
+    /**
+     * Initializes server data
+     * @param serverData - DTO.ServerData that contains information for connection to a server
+     */
+    public void setServerData(ServerData serverData){
+        this.serverData = serverData;
+    }
+
+    /**
+     * Starts server
+     */
+    @Override
+    public void run() {
+        try{
+            connectToServer();
+            createIOStreams();
+        }catch (Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    /**
+     * Connecting to server using sockets
+     * @throws Exception
+     */
+    private void connectToServer() throws Exception{
+        SocketFactory socketFactory = SocketFactory.getDefault();
+        connection = socketFactory.createSocket(serverData.getServerIP(), serverData.getPortNr());
+        System.out.println("----------Socket created!------------");
+    }
+
+    /**
+     * Create input and output streams
+     * @throws Exception
+     */
+    private void createIOStreams() throws Exception{
+        outputStream = new ObjectOutputStream(connection.getOutputStream());
+        outputStream.flush();
+
+        inputStream = new ObjectInputStream(connection.getInputStream());
+        System.out.println("----------IO Streams created!------------");
+    }
+
+    /**
+     * Return boolean value true if connection and IO streams are established or false if not
+     * @return boolean value of server status
+     */
+    public boolean isConnected(){
+        return connection != null && outputStream != null && inputStream != null && connection.isConnected();
+    }
+
+    /**
+     * Creates request for getting list of connected devices
+     */
+    public Devices requestDeviceList(){
+        ClientServerTransferObject request = new GetDataRequest("devices");
+        if(outputStream == null)
+            System.out.println("--------------------Null");
+        sendMessage(request);
+        return (Devices)getUserResponse();
+    }
+
+    /**
+     * Sends messages to server
+     * @param request - request of type ClientServerTransferObject
+     */
+    private void sendMessage(ClientServerTransferObject request){
+        try{
+            outputStream.writeObject(request);
+            outputStream.flush();
+            System.out.println("--------- Message sended");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            System.err.println("----------ERROR SENDING !!!!!!!!!! ------------ :((((");
+        }
+    }
+
+    /**
+     * Gets and returns user response
+     * @return ClientServerTransferObject
+     */
+    private ClientServerTransferObject getUserResponse(){
+        try {
+            ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
+            return response;
+        }catch (ClassNotFoundException cnfEx){
+            System.out.println("------- Don't understand what server tells me! -------------");
+        }catch (Exception ex){
+            ex.printStackTrace();
+            System.out.println("-----------Aaaaaaaa... Something really wrong!!!!");
+        }
+        return null;
+    }
+}
