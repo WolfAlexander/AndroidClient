@@ -13,7 +13,7 @@ import DTO.Devices;
 import se.learning.home.androidclient.controller.Controller;
 import se.learning.home.androidclient.model.ConnectionToServer;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity{
     private final Controller controller = new Controller();
     private ConnectionToServer server;
 
