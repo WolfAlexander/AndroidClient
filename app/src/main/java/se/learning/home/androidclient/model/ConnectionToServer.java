@@ -8,6 +8,7 @@ import javax.net.SocketFactory;
 
 import DTO.ClientServerTransferObject;
 import DTO.ControlDevice;
+import DTO.Device;
 import DTO.Devices;
 import DTO.GetDataRequest;
 import DTO.ServerData;
@@ -99,6 +100,15 @@ public class ConnectionToServer implements Runnable{
         ClientServerTransferObject request = new GetDataRequest("devices");
         sendMessage(request);
         return (Devices)getUserResponse();
+    }
+
+    /**
+     * Submit new device data to server
+     * @param device - DTO.Device containing new device data
+     */
+    public void addNewDevice(Device device){
+        ClientServerTransferObject request = device;
+        sendMessage(request);
     }
 
     /**

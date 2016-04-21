@@ -1,5 +1,6 @@
 package se.learning.home.androidclient.controller;
 
+import DTO.Device;
 import DTO.Devices;
 import DTO.ServerData;
 import se.learning.home.androidclient.model.ConnectionToServer;
@@ -10,14 +11,13 @@ import se.learning.home.androidclient.model.ConnectionToServer;
  * In this case we don't follow complete MVC pattern - view will have some logic
  */
 public class Controller {
-    private ConnectionToServer server;
+    private final ConnectionToServer server = ConnectionToServer.getInstance();;
 
     /**
      * This method tells ConnectionToServer object to establish connection
      * @param serverData - data needed to establish connection with server
      */
     public void connectToServer(ServerData serverData){
-        server = ConnectionToServer.getInstance();
         server.setServerData(serverData);
         new Thread(server).start();
     }
@@ -49,5 +49,15 @@ public class Controller {
      */
     public void switchDeviceOnServer(int deviceID){
         server.switchDevice(deviceID);
+    }
+
+    /**
+     * Requests server to add new device
+     * @param device - DTO.Device contains new device data
+     */
+    public void addingDeviceToServer(Device device){
+        if(server == null)
+            System.out.println("----------------------eeeeeeeee");
+        server.addNewDevice(device);
     }
 }

@@ -1,16 +1,20 @@
-package se.learning.home.androidclient;
+package view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
 import DTO.Device;
 import DTO.Devices;
+import se.learning.home.androidclient.R;
 import se.learning.home.androidclient.controller.Controller;
 import se.learning.home.androidclient.model.ConnectionToServer;
 
@@ -18,9 +22,8 @@ import se.learning.home.androidclient.model.ConnectionToServer;
  * Start activity of this app
  * Creates list of switches to control devices that are connected to server
  */
-public class HomeActivity extends AppCompatActivity{
-    private final Controller controller = new Controller();
-    private ConnectionToServer server;
+public class HomeActivity extends CustomActivity{
+    private final Controller controller = super.getController();
 
     /**
      * Called when app is starting
@@ -31,13 +34,45 @@ public class HomeActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        createExitBttn();
+        createAddButtn();
+
         controller.connectToServer(new DTO.ServerData("10.0.2.2", 5821));
 
         while(!controller.isConnectedToServer()){}
 
         System.out.println("--------Connected!");
         new ShowAllDevices(this).execute();
+
+
+
     }
+
+    /**
+     * Creates a button that will close application and sets a listener for user click
+     */
+    private void createExitBttn(){
+        final Button exitButton = (Button) findViewById(R.id.myExitButton);
+        exitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                System.exit(0);
+            }
+        });
+    }
+
+    private void createAddButtn(){
+        final Button addButton = (Button) findViewById(R.id.addButton);
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent nextScreen = new Intent(getApplicationContext(), AddDevice.class);
+                startActivity(nextScreen);
+            }
+        });
+    }
+
 
 
     /**
