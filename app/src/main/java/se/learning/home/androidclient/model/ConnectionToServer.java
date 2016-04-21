@@ -7,12 +7,13 @@ import java.net.Socket;
 import javax.net.SocketFactory;
 
 import DTO.ClientServerTransferObject;
+import DTO.ControlDevice;
 import DTO.Devices;
 import DTO.GetDataRequest;
 import DTO.ServerData;
 
 /**
- * Singelton class that handles connection and conversation to server
+ * Singleton class that handles connection and conversation with server
  */
 public class ConnectionToServer implements Runnable{
     private static ConnectionToServer serverInstance = new ConnectionToServer();
@@ -81,13 +82,21 @@ public class ConnectionToServer implements Runnable{
         return connection != null && outputStream != null && inputStream != null && connection.isConnected();
     }
 
+
+    /**
+     * Tells server to switch status of the device with given deviceID
+     * @param deviceID - id of the device
+     */
+    public void switchDevice(int deviceID){
+        ClientServerTransferObject request = new ControlDevice(deviceID);
+        sendMessage(request);
+    }
+
     /**
      * Creates request for getting list of connected devices
      */
     public Devices requestDeviceList(){
         ClientServerTransferObject request = new GetDataRequest("devices");
-        if(outputStream == null)
-            System.out.println("--------------------Null");
         sendMessage(request);
         return (Devices)getUserResponse();
     }

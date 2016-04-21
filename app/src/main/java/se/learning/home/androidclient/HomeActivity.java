@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 
@@ -13,93 +14,154 @@ import DTO.Devices;
 import se.learning.home.androidclient.controller.Controller;
 import se.learning.home.androidclient.model.ConnectionToServer;
 
+/**
+ * Start activity of this app
+ * Creates list of switches to control devices that are connected to server
+ */
 public class HomeActivity extends AppCompatActivity{
     private final Controller controller = new Controller();
     private ConnectionToServer server;
 
+    /**
+     * Called when app is starting
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        server = controller.connectToServer(new DTO.ServerData("10.0.2.2", 5821));
+        controller.connectToServer(new DTO.ServerData("10.0.2.2", 5821));
 
-        while(!server.isConnected()){}
+        while(!controller.isConnectedToServer()){}
 
         System.out.println("--------Connected!");
         new ShowAllDevices(this).execute();
     }
 
+
+    /**
+     * UI Thread that collects device list from server and
+     * makes device controllers appear to the screen
+     */
     private class ShowAllDevices extends AsyncTask {
         private Context context;
 
+        /**
+         * Constructor that initializes context variable
+         * @param context - context of UI Activity that uses this UI Thread
+         */
         public ShowAllDevices(Context context){
             this.context = context;
         }
 
+        /**
+         * This method requests model to retrieve device list from server
+         * @param params - must be there since we override this method
+         * @return DTO.Devices - list of devices from server
+         */
         @Override
         protected Devices doInBackground(Object[] params) {
             return controller.getListOfDevices();
         }
 
+        /**
+         * This method is being called after  doInBackground returned
+         * This method creates switch-buttons from device list and makes them appear on the screen
+         * @param o - return value from doInBackground method
+         */
         @Override
         protected void onPostExecute(Object o) {
             Devices devices = (Devices)o;
-            int position = 250;
+            int topMargin = 250;
             RelativeLayout layout = (RelativeLayout) findViewById(R.id.homeLayout);
-            System.out.println(devices);
+
             for(Device d : devices.getDeviceList()){
-                Switch s = new Switch(context);
-                s.setId(d.getId());
-                s.setText(d.getName());
-                s.setChecked(d.getStatus());
-                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                );
-                params.setMargins(0, position, 0, 0);
-                s.setLayoutParams(params);
+                Switch s = createSwitch(d, topMargin);
                 layout.addView(s);
-                position += 120;
+                topMargin += 120;
             }
+        }
 
+        /**
+         * Creates custom switches
+         * @param deviceInformation - information about a device that this switch will control
+         * @param topMargin - int value of top margin
+         * @return instance of created Switch
+         */
+        private Switch createSwitch(Device deviceInformation , int topMargin){
+            Switch s = new Switch(context);
+            setNonLayoutParams(s, deviceInformation);
+            setLayoutParams(s, topMargin);
+            setEventListener(s);
 
+            return s;
+        }
 
+        /**
+         * Sets functional parameters to the Switch - id, name, checked/unchecked
+         * @param s - Switch instance
+         * @param deviceInformation - DTO.Device information about the device
+         */
+        private void setNonLayoutParams(Switch s, Device deviceInformation){
+            s.setId(deviceInformation.getId());
+            s.setText(deviceInformation.getName());
+            s.setChecked(deviceInformation.getStatus());
+        }
 
+        /**
+         * Sets layout parameter to the Switch
+         * @param s - Switch instance
+         * @param topMargin - int top margin value
+         */
+        private void setLayoutParams(Switch s, int topMargin){
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            params.setMargins(0, topMargin, 0, 0);
+            s.setLayoutParams(params);
+        }
 
+        /**
+         * Sets a listener on the Switch that will wait for user action on the Switch
+         * @param s - Switch instance
+         */
+        private void setEventListener(Switch s){
+            s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    new SwitchDevice(buttonView.getId()).execute();
+                }
+            });
+        }
+    }
 
+    /**
+     * This UI Thread that contacts server to change status(on/off) of a device
+     */
+    private class SwitchDevice extends AsyncTask {
+        private int deviceId;
+
+        /**
+         * Constructor - initializes deviceId value
+         * @param deviceId - id of the device that user wants to change status of
+         */
+        public SwitchDevice(int deviceId){
+            this.deviceId = deviceId;
+        }
+
+        /**
+         * Sends change device status request to server with identification of the device
+         * @param params - has to be there because we override this method
+         * @return - null in this case because we will not receive any response from server
+         * for this request
+         */
+        @Override
+        protected Object doInBackground(Object[] params) {
+            controller.switchDeviceOnServer(deviceId);
+            System.out.println("Switching " + deviceId);
+            return null;
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-        /*RelativeLayout layout = new RelativeLayout(this);
-        HandleServerConnection server = new HandleServerConnection("10.0.2.2", 5821, layout, this);
-        server.execute();
-
-        while(!server.getDone()){
-            try {
-                wait(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        Devices devices = server.requestDeviceList();
-
-        Switch[] switches = new Switch[devices.getNumberOfDevices()];
-        for(int i = 0; i < devices.getNumberOfDevices(); i++){
-            switches[i] = new Switch(this);
-            layout.addView(switches[i]);
-        }
-
-        setContentView(layout);*/
