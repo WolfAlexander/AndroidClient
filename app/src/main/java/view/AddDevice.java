@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -100,7 +101,7 @@ public class AddDevice extends CustomActivity {
                     if (protocolChosen == null || modelChosen == null) {
                         System.out.println("Choose stuff!!!!!!!!");
                     } else {
-                        TextView deviceNameTextView = (TextView) findViewById(R.id.deviceName);
+                        EditText deviceNameTextView = (EditText) findViewById(R.id.editText);
                         deviceName = deviceNameTextView.getText().toString();
                         new SubmitNewDevice().execute();
                     }
