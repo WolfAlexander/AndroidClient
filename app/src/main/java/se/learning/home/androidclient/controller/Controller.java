@@ -8,9 +8,9 @@ import se.learning.home.androidclient.model.ConnectionToServer;
 /**
  * Controller takes requests from View to appropriate object
  * and return values from this object to View
- * In this case we don't follow complete MVC pattern - view will have some logic
+ * In this case we don't follow complete MVC pattern - se.learning.home.androidclient.view will have some logic
  */
-public class Controller {
+public final class Controller {
     private final ConnectionToServer server = ConnectionToServer.getInstance();;
 
     /**
@@ -56,8 +56,6 @@ public class Controller {
      * @param device - DTO.Device contains new device data
      */
     public void addingDeviceToServer(Device device){
-        if(server == null)
-            System.out.println("----------------------eeeeeeeee");
         server.addNewDevice(device);
     }
 }

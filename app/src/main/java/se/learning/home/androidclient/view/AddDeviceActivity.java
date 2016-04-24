@@ -1,4 +1,4 @@
-package view;
+package se.learning.home.androidclient.view;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import DTO.Device;
 import se.learning.home.androidclient.R;
@@ -17,7 +16,7 @@ import se.learning.home.androidclient.controller.Controller;
  * This activity is used by user to add new devices
  * to the server
  */
-public class AddDevice extends CustomActivity {
+public class AddDeviceActivity extends CustomActivity {
     private final Controller controller = super.getController();
     private String protocolChosen;
     private String modelChosen;
@@ -98,11 +97,16 @@ public class AddDevice extends CustomActivity {
             submitNewDeviceBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (protocolChosen == null || modelChosen == null) {
-                        System.out.println("Choose stuff!!!!!!!!");
-                    } else {
+                    if (protocolChosen == null) {
+                        AddDeviceActivity.super.showAlertMessage("You have to chose a protocol to add new device!");
+                    } else if(modelChosen == null){
+                        AddDeviceActivity.super.showAlertMessage("You have to chose a model to add new device!");
+                    }else {
                         EditText deviceNameTextView = (EditText) findViewById(R.id.editText);
                         deviceName = deviceNameTextView.getText().toString();
+                        if(deviceName.length() == 0)
+                            deviceName = "No name";
+
                         new SubmitNewDevice().execute();
                     }
                 }
@@ -122,7 +126,6 @@ public class AddDevice extends CustomActivity {
          */
         @Override
         protected Object doInBackground(Object[] params) {
-            System.out.println("Submint");
             controller.addingDeviceToServer(new Device(deviceName, protocolChosen, modelChosen));
             return null;
         }
@@ -132,8 +135,8 @@ public class AddDevice extends CustomActivity {
          */
         @Override
         protected void onPreExecute() {
-            System.out.println("Done");
-            finish();
+            AddDeviceActivity.super.showAlertMessage("New device added!");
+           // finish();
         }
     }
 }

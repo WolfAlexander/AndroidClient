@@ -16,7 +16,7 @@ import DTO.ServerData;
 /**
  * Singleton class that handles connection and conversation with server
  */
-public class ConnectionToServer implements Runnable{
+public final class ConnectionToServer implements Runnable{
     private static ConnectionToServer serverInstance = new ConnectionToServer();
     private ServerData serverData;
     private Socket connection;
@@ -41,7 +41,7 @@ public class ConnectionToServer implements Runnable{
     }
 
     /**
-     * Starts server
+     * Starts connection to server
      */
     @Override
     public void run() {

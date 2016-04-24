@@ -1,9 +1,10 @@
 package DTO;
 
 /**
- * Created by Alexander on 2016-04-19.
+ * This DTO is used to transfer server data
+ * For now it is server IP address and port number
  */
-public class ServerData {
+public final class ServerData {
     private String serverIP;
     private int portNr;
 

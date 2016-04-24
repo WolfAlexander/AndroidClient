@@ -1,10 +1,9 @@
-package view;
+package se.learning.home.androidclient.view;
 
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,14 +15,15 @@ import DTO.Device;
 import DTO.Devices;
 import se.learning.home.androidclient.R;
 import se.learning.home.androidclient.controller.Controller;
-import se.learning.home.androidclient.model.ConnectionToServer;
 
 /**
  * Start activity of this app
- * Creates list of switches to control devices that are connected to server
+ * Connects to server and creates list of switches to control
+ * devices that are connected to server
  */
 public class HomeActivity extends CustomActivity{
     private final Controller controller = super.getController();
+    private final String serverIP = "10.0.2.2";
 
     /**
      * Called when app is starting
@@ -35,17 +35,13 @@ public class HomeActivity extends CustomActivity{
         setContentView(R.layout.activity_home);
 
         createExitBttn();
-        createAddButtn();
-
-        controller.connectToServer(new DTO.ServerData("10.0.2.2", 5821));
+        createAddBttn();
+        controller.connectToServer(new DTO.ServerData(serverIP, 5821));
 
         while(!controller.isConnectedToServer()){}
 
-        System.out.println("--------Connected!");
+        System.out.println("--------Connected!---------");
         new ShowAllDevices(this).execute();
-
-
-
     }
 
     /**
@@ -62,18 +58,16 @@ public class HomeActivity extends CustomActivity{
         });
     }
 
-    private void createAddButtn(){
+    private void createAddBttn(){
         final Button addButton = (Button) findViewById(R.id.addButton);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent nextScreen = new Intent(getApplicationContext(), AddDevice.class);
+                Intent nextScreen = new Intent(getApplicationContext(), AddDeviceActivity.class);
                 startActivity(nextScreen);
             }
         });
     }
-
-
 
     /**
      * UI Thread that collects device list from server and

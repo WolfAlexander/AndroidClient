@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * This DTO contains ArrayList of DTO.Device objects
  * and used as return object for users getAllDevices request
  */
-public class Devices extends ClientServerTransferObject{
+public final class Devices extends ClientServerTransferObject{
     private ArrayList<Device> devices;
 
     /**
@@ -20,7 +20,7 @@ public class Devices extends ClientServerTransferObject{
     /**
      * @return ArrayList of Device objects
      */
-    public ArrayList<Device> getDeviceList() {
+    public final ArrayList<Device> getDeviceList() {
         return devices;
     }
 
@@ -28,21 +28,22 @@ public class Devices extends ClientServerTransferObject{
      * Overwrites old devices value with a new one
      * @param devices - new ArrayList of Device objects
      */
-    public void setDevices(ArrayList<Device> devices) {
+    public final void setDevices(ArrayList<Device> devices) {
         this.devices = devices;
     }
 
     /**
      * @return int - number of devices
      */
-    public int getNumberOfDevices(){
+    public final int getNumberOfDevices(){
         return devices.size();
     }
 
     /**
      * @return String representation of this object
      */
-    public String toString(){
+    @Override
+    public final String toString(){
         StringBuilder string = new StringBuilder("");
 
         for (Device device : devices)
