@@ -25,6 +25,14 @@
         <activity
             android:name=".view.AddDeviceActivity"
             android:label="@string/title_activity_add_device"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.ScheduleActivity"
+            android:label="@string/title_activity_schedule"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.AddNewEventToSchedule"
+            android:label="@string/title_activity_add_new_event"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

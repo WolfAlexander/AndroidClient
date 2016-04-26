@@ -1,17 +1,44 @@
 <resources>
-    <string name="app_name">AndroidClient</string>
-    <string name="action_settings">Settings</string>
-    <string name="AppName">App name</string>
-    <string name="exitBttn">Exit</string>
-    <string name="title_activity_add_device">AddDevice</string>
-    <string name="chooseText">Choose here ...</string>
-    <string name="addBttn">Add device</string>
+    <!--General-->
+    <string name="back_bttn">Back</string>
+    <string name="submit_bttn">Submit</string>
+    <string name="click_to_change">Click to change…</string>
 
-    <string-array name="protocol">
-        <item name = "baseitem">arctech</item>
+    <!--HomeActivity-->
+    <string name="app_name">Smart Home Controller</string>
+    <string name="action_settings">Settings</string>
+    <string name="close_app_bttn">Exit</string>
+    <string name="add_device_bttn">Add device</string>
+
+    <!--AddDeviceActivity-->
+    <string name="title_activity_add_device">Add new device</string>
+    <string name="device_name_text_view">Device name:</string>
+    <string name="protocol_text_view">Protocol:</string>
+    <string name="model_text_view">Model:</string>
+    <string name="chooseText">Choose here …</string>
+
+    <string-array name="protocolList">
+        <item name="baseitem">arctech</item>
     </string-array>
 
-    <string-array name="model">
-        <item name = "baseitem">selflearning-switch</item>
+    <string-array name="modelList">
+        <item name="baseitem">selflearning-switch</item>
+    </string-array>
+    <string name="title_activity_schedule">ScheduleActivity</string>
+
+    <!--ScheduleActivity-->
+    <string name="schedule_title">Schedule</string>
+    <string name="title_activity_add_new_event">AddNewEvent</string>
+
+    <!---ScheduleNewEvent-->
+    <string name="schedule_event">Schedule new event</string>
+    <string name="device_list_name">Device:</string>
+    <string name="event_event">Date:</string>
+    <string name="event_time">Time:</string>
+    <string name="event_on_off">Device should be:</string>
+
+    <string-array name="status_list">
+        <item name ="On">On</item>
+        <item name ="Off">Off</item>
     </string-array>
 </resources>

@@ -9,19 +9,20 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".view.AddDevice"
-    tools:showIn="@layout/activity_add_device"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    tools:context=".view.AddNewEvent"
+    tools:showIn="@layout/activity_add_new_event"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/title_activity_add_device"
-        android:id="@+id/addDeviceTitleTextView" />
+        android:text="@string/schedule_event"
+        android:id="@+id/textView"
+        android:layout_gravity="center_horizontal" />
 
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -29,16 +30,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/device_name_text_view"
-            android:id="@+id/deviceNameTextView" />
+            android:text="@string/device_list_name"
+            android:id="@+id/textView3"
+            android:layout_gravity="center_vertical" />
 
-        <EditText
-            android:layout_width="fill_parent"
+        <Spinner
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/enteredDeviceName"
-            android:layout_marginLeft="31dp"
-            android:layout_marginStart="31dp"
-            android:inputType="text" />
+            android:id="@+id/deviceListForScheduling" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -50,14 +50,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/protocol_text_view"
-            android:id="@+id/protocolTextView" />
+            android:text="@string/event_event"
+            android:id="@+id/textView4" />
 
-        <Spinner
-            android:layout_width="wrap_content"
+        <TextView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/protocolSpinner"
-            android:entries="@array/protocolList" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/click_to_change"
+            android:id="@+id/datePicker"
+            android:layout_marginLeft="20dp" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -69,26 +72,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/model_text_view"
-            android:id="@+id/modelTextView" />
+            android:text="@string/event_time"
+            android:id="@+id/textView5" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/click_to_change"
+            android:id="@+id/timePicker"
+            android:layout_marginLeft="20dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/event_on_off"
+            android:id="@+id/textView6" />
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/modelSpinner"
-            android:entries="@array/modelList" />
+            android:id="@+id/onOffSpinner"
+            android:entries="@array/status_list" />
     </LinearLayout>
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/submit_bttn"
-        android:id="@+id/submitNewDeviceBttn" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/back_bttn"
-        android:id="@+id/backBttn" />
+        android:id="@+id/submitNewEventBttn"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

@@ -27,8 +27,8 @@ public class AddDeviceActivity extends CustomActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_device);
 
-        createBackBttn();
-        submitDeviceBttn();
+        createBackButton();
+        submitDeviceButton();
         handleProtocolSpinner();
         handleModelSpinner();
     }
@@ -36,7 +36,7 @@ public class AddDeviceActivity extends CustomActivity {
     /**
      * Creates and handles back button and its action
      */
-    private void createBackBttn() {
+    private void createBackButton() {
         final Button backBttn = (Button) findViewById(R.id.backBttn);
         if (backBttn != null) {
             backBttn.setOnClickListener(new View.OnClickListener() {
@@ -91,8 +91,8 @@ public class AddDeviceActivity extends CustomActivity {
     /**
      * Creates and handles submit device button and its action
      */
-    private void submitDeviceBttn() {
-        final Button submitNewDeviceBttn = (Button) findViewById(R.id.submitNewDeviceButton);
+    private void submitDeviceButton() {
+        final Button submitNewDeviceBttn = (Button) findViewById(R.id.submitNewDeviceBttn);
         if (submitNewDeviceBttn != null) {
             submitNewDeviceBttn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -102,7 +102,7 @@ public class AddDeviceActivity extends CustomActivity {
                     } else if(modelChosen == null){
                         AddDeviceActivity.super.showAlertMessage("You have to chose a model to add new device!");
                     }else {
-                        EditText deviceNameTextView = (EditText) findViewById(R.id.editText);
+                        EditText deviceNameTextView = (EditText) findViewById(R.id.enteredDeviceName);
                         deviceName = deviceNameTextView.getText().toString();
                         if(deviceName.length() == 0)
                             deviceName = "No name";

@@ -2,6 +2,7 @@ package se.learning.home.androidclient.controller;
 
 import DTO.Device;
 import DTO.Devices;
+import DTO.Schedule;
 import DTO.ServerData;
 import se.learning.home.androidclient.model.ConnectionToServer;
 
@@ -11,7 +12,7 @@ import se.learning.home.androidclient.model.ConnectionToServer;
  * In this case we don't follow complete MVC pattern - se.learning.home.androidclient.view will have some logic
  */
 public final class Controller {
-    private final ConnectionToServer server = ConnectionToServer.getInstance();;
+    private final ConnectionToServer server = ConnectionToServer.getInstance();
 
     /**
      * This method tells ConnectionToServer object to establish connection
@@ -58,4 +59,6 @@ public final class Controller {
     public void addingDeviceToServer(Device device){
         server.addNewDevice(device);
     }
+
+    public Schedule getScheduleListFromServer (){ return server.requestSchedule();}
 }

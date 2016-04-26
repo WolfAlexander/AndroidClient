@@ -8,8 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
+
+import java.util.ArrayList;
 
 import DTO.Device;
 import DTO.Devices;
@@ -23,6 +26,7 @@ import se.learning.home.androidclient.controller.Controller;
  */
 public class HomeActivity extends CustomActivity{
     private final Controller controller = super.getController();
+    //private final String serverIP = "130.237.238.42";
     private final String serverIP = "10.0.2.2";
 
     /**
@@ -34,21 +38,50 @@ public class HomeActivity extends CustomActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        createExitBttn();
-        createAddBttn();
-        controller.connectToServer(new DTO.ServerData(serverIP, 5821));
+        createExitButton();
+        createAddButton();
+        createScheduleButton();
 
+        System.out.println("------Connecting...-------");
+
+        controller.connectToServer(new DTO.ServerData(serverIP, 5821));
         while(!controller.isConnectedToServer()){}
 
-        System.out.println("--------Connected!---------");
+        /*synchronized (this){
+            try {
+                int connectionTries = 0;
+                System.out.println("Waiting...");
+                this.wait(1000);
+                System.out.println("Waiting done!");
+
+                while (connectionTries != 5){
+                    System.out.println("Hellooooo! Its Ulrika ;)! Ulrika says: " + connectionTries);
+
+                    if(connectionTries == 4){
+                        super.showAlertMessage("Could not connect to server");
+                        System.exit(0);
+                    }else if (!controller.isConnectedToServer()) {
+                        connectionTries++;
+                        this.wait(3000);
+                    }else{
+                        System.out.println("--------Connected!---------");
+                        break;
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }*/
+
         new ShowAllDevices(this).execute();
+
     }
 
     /**
      * Creates a button that will close application and sets a listener for user click
      */
-    private void createExitBttn(){
-        final Button exitButton = (Button) findViewById(R.id.myExitButton);
+    private void createExitButton(){
+        final Button exitButton = (Button) findViewById(R.id.closeAppBttn);
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,13 +91,24 @@ public class HomeActivity extends CustomActivity{
         });
     }
 
-    private void createAddBttn(){
-        final Button addButton = (Button) findViewById(R.id.addButton);
+    private void createAddButton(){
+        final Button addButton = (Button) findViewById(R.id.addDeviceBttn);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent nextScreen = new Intent(getApplicationContext(), AddDeviceActivity.class);
                 startActivity(nextScreen);
+            }
+        });
+    }
+    private void createScheduleButton(){
+        final Button scheduleBttn = (Button) findViewById(R.id.scheduleBttn);
+        scheduleBttn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent nextScreen = new Intent(getApplicationContext(), ScheduleActivity.class);
+                startActivity(nextScreen);
+
             }
         });
     }
@@ -102,26 +146,29 @@ public class HomeActivity extends CustomActivity{
         @Override
         protected void onPostExecute(Object o) {
             Devices devices = (Devices)o;
-            int topMargin = 250;
-            RelativeLayout layout = (RelativeLayout) findViewById(R.id.homeLayout);
+            LinearLayout layout = (LinearLayout) findViewById(R.id.deviceListView);
+            ArrayList<Device> deviceList = devices.getDeviceList();
 
-            for(Device d : devices.getDeviceList()){
-                Switch s = createSwitch(d, topMargin);
-                layout.addView(s);
-                topMargin += 120;
+            if(!deviceList.isEmpty()){
+                for(Device d : devices.getDeviceList()){
+                    Switch s = createSwitch(d);
+                    layout.addView(s);
+                }
+            }else{
+                showAlertMessage("No devices found!");
             }
+
         }
 
         /**
          * Creates custom switches
          * @param deviceInformation - information about a device that this switch will control
-         * @param topMargin - int value of top margin
          * @return instance of created Switch
          */
-        private Switch createSwitch(Device deviceInformation , int topMargin){
+        private Switch createSwitch(Device deviceInformation){
             Switch s = new Switch(context);
             setNonLayoutParams(s, deviceInformation);
-            setLayoutParams(s, topMargin);
+            setLayoutParams(s);
             setEventListener(s);
 
             return s;
@@ -141,14 +188,12 @@ public class HomeActivity extends CustomActivity{
         /**
          * Sets layout parameter to the Switch
          * @param s - Switch instance
-         * @param topMargin - int top margin value
          */
-        private void setLayoutParams(Switch s, int topMargin){
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+        private void setLayoutParams(Switch s){
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
-            params.setMargins(0, topMargin, 0, 0);
             s.setLayoutParams(params);
         }
 

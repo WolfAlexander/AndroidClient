@@ -2,7 +2,9 @@ package se.learning.home.androidclient.model;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
 
 import javax.net.SocketFactory;
 
@@ -11,6 +13,8 @@ import DTO.ControlDevice;
 import DTO.Device;
 import DTO.Devices;
 import DTO.GetDataRequest;
+import DTO.Schedule;
+import DTO.ScheduledEvent;
 import DTO.ServerData;
 
 /**
@@ -49,7 +53,7 @@ public final class ConnectionToServer implements Runnable{
             connectToServer();
             createIOStreams();
         }catch (Exception ex){
-            System.out.println(ex.getMessage());
+            System.err.println(ex.getMessage());
         }
     }
 
@@ -58,9 +62,15 @@ public final class ConnectionToServer implements Runnable{
      * @throws Exception
      */
     private void connectToServer() throws Exception{
-        SocketFactory socketFactory = SocketFactory.getDefault();
-        connection = socketFactory.createSocket(serverData.getServerIP(), serverData.getPortNr());
-        System.out.println("----------Socket created!------------");
+        try{
+            SocketFactory socketFactory = SocketFactory.getDefault();
+            connection = socketFactory.createSocket(serverData.getServerIP(), serverData.getPortNr());
+            System.out.println("----------Socket created!------------");
+        }catch (ConnectException conEx){
+            System.out.println("TIME OUT");
+        }catch (Exception ex){
+            throw new Exception(ex.getMessage());
+        }
     }
 
     /**
@@ -100,6 +110,17 @@ public final class ConnectionToServer implements Runnable{
         ClientServerTransferObject request = new GetDataRequest("devices");
         sendMessage(request);
         return (Devices)getUserResponse();
+    }
+
+    /**
+     * Requests schedule from server
+     * @return DTO.Schedule that contains ScheduledEvent:s that containt schedule information for
+     * each event
+     */
+    public Schedule requestSchedule(){
+        ClientServerTransferObject request = new GetDataRequest("schedule");
+        sendMessage(request);
+        return (Schedule) getUserResponse();
     }
 
     /**
