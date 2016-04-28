@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Switch;
 
 import java.util.ArrayList;
@@ -18,13 +17,14 @@ import DTO.Device;
 import DTO.Devices;
 import se.learning.home.androidclient.R;
 import se.learning.home.androidclient.controller.Controller;
+import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
 /**
  * Start activity of this app
  * Connects to server and creates list of switches to control
  * devices that are connected to server
  */
-public class HomeActivity extends CustomActivity{
+public class HomeActivity extends CustomActivity implements DeviceListObserver{
     private final Controller controller = super.getController();
     //private final String serverIP = "130.237.238.42";
     private final String serverIP = "10.0.2.2";
@@ -113,6 +113,11 @@ public class HomeActivity extends CustomActivity{
         });
     }
 
+    @Override
+    public void updateDeviceList(Devices devices) {
+        System.out.println(devices);
+    }
+
     /**
      * UI Thread that collects device list from server and
      * makes device controllers appear to the screen
@@ -195,6 +200,8 @@ public class HomeActivity extends CustomActivity{
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
             s.setLayoutParams(params);
+            s.setPadding(0, 30, 0, 30);
+
         }
 
         /**

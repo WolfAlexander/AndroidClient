@@ -11,7 +11,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".view.ScheduleActivity"
     tools:showIn="@layout/activity_schedule"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/backgrounds">
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,9 +24,9 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:id="@+id/scrollView2"
-        android:layout_weight="0.95">
+        android:layout_weight="5">
 
         <LinearLayout
             android:orientation="vertical"
@@ -46,10 +47,10 @@
         android:gravity="center">
 
         <Button
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add event"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            style="@style/ButtonStyle"
+            android:text="@string/add_new_device_bttn"
             android:id="@+id/addNewEvent"
             android:layout_gravity="center_horizontal" />
     </LinearLayout>

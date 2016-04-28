@@ -11,7 +11,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".view.AddNewEvent"
     tools:showIn="@layout/activity_add_new_event"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/backgrounds">
 
     <TextView
         android:layout_width="wrap_content"
@@ -105,8 +106,9 @@
     </LinearLayout>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="35dp"
+        style="@style/ButtonStyle"
         android:text="@string/submit_bttn"
         android:id="@+id/submitNewEventBttn"
         android:layout_gravity="center_horizontal" />

@@ -1,5 +1,5 @@
 <resources>
-    <!--General-->
+    <!--General Buttons-->
     <string name="back_bttn">Back</string>
     <string name="submit_bttn">Submit</string>
     <string name="click_to_change">Click to change…</string>
@@ -7,8 +7,9 @@
     <!--HomeActivity-->
     <string name="app_name">Smart Home Controller</string>
     <string name="action_settings">Settings</string>
-    <string name="close_app_bttn">Exit</string>
     <string name="add_device_bttn">Add device</string>
+    <string name="close_app_bttn">Exit</string>
+    <string name="schedule_bttn">Schedule</string>
 
     <!--AddDeviceActivity-->
     <string name="title_activity_add_device">Add new device</string>
@@ -29,6 +30,7 @@
     <!--ScheduleActivity-->
     <string name="schedule_title">Schedule</string>
     <string name="title_activity_add_new_event">AddNewEvent</string>
+    <string name="add_new_device_bttn">Add event</string>
 
     <!---ScheduleNewEvent-->
     <string name="schedule_event">Schedule new event</string>

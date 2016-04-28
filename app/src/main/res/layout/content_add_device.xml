@@ -12,7 +12,8 @@
     tools:context=".view.AddDevice"
     tools:showIn="@layout/activity_add_device"
     android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:background="@drawable/backgrounds">
 
     <TextView
         android:layout_width="wrap_content"
@@ -80,14 +81,16 @@
     </LinearLayout>
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="35dp"
+        style="@style/ButtonStyle"
         android:text="@string/submit_bttn"
         android:id="@+id/submitNewDeviceBttn" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="100dp"
+        android:layout_height="35dp"
+        style="@style/ButtonStyle"
         android:text="@string/back_bttn"
         android:id="@+id/backBttn" />
 

@@ -14,22 +14,20 @@
     android:id="@+id/homeLayout"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:weightSum="1">
+    android:background="@drawable/backgrounds">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="@string/app_name"
-        android:id="@+id/appNameTextView"
-        android:layout_marginTop="21dp" />
+        android:id="@+id/appNameTextView" />
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:id="@+id/scrollView"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.95">
+        android:layout_weight="5">
 
         <LinearLayout
             android:orientation="vertical"
@@ -49,22 +47,27 @@
         android:layout_weight="0.05">
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="@string/add_device_bttn"
-            android:id="@+id/addDeviceBttn" />
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:id="@+id/addDeviceBttn"
+            style="@style/ButtonStyle"
+            />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Schedule"
-            android:id="@+id/scheduleBttn" />
+            android:layout_width="100dp"
+            android:layout_height="35dp"
+            android:text="@string/schedule_bttn"
+            android:id="@+id/scheduleBttn"
+            style="@style/ButtonStyle"
+            />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="35dp"
             android:text="@string/close_app_bttn"
-            android:id="@+id/closeAppBttn" />
+            android:id="@+id/closeAppBttn"
+            style="@style/ButtonStyle"/>
 
     </LinearLayout>
 

@@ -16,6 +16,7 @@ import DTO.GetDataRequest;
 import DTO.Schedule;
 import DTO.ScheduledEvent;
 import DTO.ServerData;
+import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
 /**
  * Singleton class that handles connection and conversation with server
@@ -26,6 +27,7 @@ public final class ConnectionToServer implements Runnable{
     private Socket connection;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
+    private ArrayList<DeviceListObserver> observers = new ArrayList<>();
 
     private ConnectionToServer(){}
 
@@ -94,6 +96,15 @@ public final class ConnectionToServer implements Runnable{
     }
 
 
+    public void addObserver(DeviceListObserver observer){
+        observers.add(observer);
+    }
+
+    private void notifyAllObservers(){
+
+    }
+
+
     /**
      * Tells server to switch status of the device with given deviceID
      * @param deviceID - id of the device
@@ -107,7 +118,7 @@ public final class ConnectionToServer implements Runnable{
      * Creates request for getting list of connected devices
      */
     public Devices requestDeviceList(){
-        ClientServerTransferObject request = new GetDataRequest("devices");
+        ClientServerTransferObject request = new GetDataRequest(GetDataRequest.RequestTypes.DEVICES);
         sendMessage(request);
         return (Devices)getUserResponse();
     }
@@ -118,7 +129,7 @@ public final class ConnectionToServer implements Runnable{
      * each event
      */
     public Schedule requestSchedule(){
-        ClientServerTransferObject request = new GetDataRequest("schedule");
+        ClientServerTransferObject request = new GetDataRequest(GetDataRequest.RequestTypes.SCHEDULE);
         sendMessage(request);
         return (Schedule) getUserResponse();
     }

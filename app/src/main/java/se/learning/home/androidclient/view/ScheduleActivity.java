@@ -2,12 +2,15 @@ package se.learning.home.androidclient.view;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -82,11 +85,16 @@ public class ScheduleActivity extends CustomActivity {
             /*Name text view*/
             TextView deviceNameTextView = new TextView(context);
             deviceNameTextView.setText(this.deviceName);
+            deviceNameTextView.setTextColor(Color.BLACK);
+            deviceNameTextView.setShadowLayer(10, 0, 0, Color.WHITE);
             nameDateBlock.addView(deviceNameTextView);
 
             /*Date text ve*/
             TextView scheduleDateTextView = new TextView(context);
             scheduleDateTextView.setText(this.scheduleDate);
+            scheduleDateTextView.setGravity(Gravity.RIGHT);
+            scheduleDateTextView.setTextColor(Color.WHITE);
+            scheduleDateTextView.setShadowLayer(10, 0, 0, Color.BLACK);
             nameDateBlock.addView(scheduleDateTextView);
 
             /*Add inner block to outer block*/
