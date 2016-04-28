@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,6 +27,7 @@ import se.learning.home.androidclient.interfaces.DeviceListObserver;
  */
 public class HomeActivity extends CustomActivity implements DeviceListObserver{
     private final Controller controller = super.getController();
+    private final DeviceListObserver deviceListObserver = this;
     //private final String serverIP = "130.237.238.42";
     private final String serverIP = "10.0.2.2";
 
@@ -46,6 +48,9 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
 
         controller.connectToServer(new DTO.ServerData(serverIP, 5821));
         while(!controller.isConnectedToServer()){}
+
+        showListOfDevices();
+
 
         /*synchronized (this){
             try {
@@ -72,9 +77,17 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
                 e.printStackTrace();
             }
         }*/
+    }
 
-        new ShowAllDevices(this).execute();
-
+    private void showListOfDevices(){
+        new AsyncTask(){
+            @Override
+            protected Object doInBackground(Object[] params) {
+                System.out.println("---------Requesting");
+                controller.requestListOfDevicesFromServer(deviceListObserver);
+                return null;
+            }
+        }.execute();
     }
 
     /**
@@ -82,6 +95,7 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
      */
     private void createExitButton(){
         final Button exitButton = (Button) findViewById(R.id.closeAppBttn);
+        assert exitButton != null;
         exitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -93,129 +107,110 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
 
     private void createAddButton(){
         final Button addButton = (Button) findViewById(R.id.addDeviceBttn);
-        addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent nextScreen = new Intent(getApplicationContext(), AddDeviceActivity.class);
-                startActivity(nextScreen);
-            }
-        });
+        if (addButton != null) {
+            addButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent nextScreen = new Intent(getApplicationContext(), AddDeviceActivity.class);
+                    startActivity(nextScreen);
+                }
+            });
+        }
     }
+
     private void createScheduleButton(){
         final Button scheduleBttn = (Button) findViewById(R.id.scheduleBttn);
-        scheduleBttn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent nextScreen = new Intent(getApplicationContext(), ScheduleActivity.class);
-                startActivity(nextScreen);
+        if (scheduleBttn != null) {
+            scheduleBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent nextScreen = new Intent(getApplicationContext(), ScheduleActivity.class);
+                    startActivity(nextScreen);
 
-            }
-        });
+                }
+            });
+        }
     }
 
     @Override
     public void updateDeviceList(Devices devices) {
-        System.out.println(devices);
+        HomeActivity.this.runOnUiThread(new ShowDevices(devices));
     }
 
-    /**
-     * UI Thread that collects device list from server and
-     * makes device controllers appear to the screen
-     */
-    private class ShowAllDevices extends AsyncTask {
-        private Context context;
+    private class ShowDevices implements Runnable{
+        private Devices devices;
 
-        /**
-         * Constructor that initializes context variable
-         * @param context - context of UI Activity that uses this UI Thread
-         */
-        public ShowAllDevices(Context context){
-            this.context = context;
+        public ShowDevices(Devices devices){
+            this.devices = devices;
         }
 
-        /**
-         * This method requests model to retrieve device list from server
-         * @param params - must be there since we override this method
-         * @return DTO.Devices - list of devices from server
-         */
         @Override
-        protected Devices doInBackground(Object[] params) {
-            return controller.getListOfDevices();
-        }
-
-        /**
-         * This method is being called after  doInBackground returned
-         * This method creates switch-buttons from device list and makes them appear on the screen
-         * @param o - return value from doInBackground method
-         */
-        @Override
-        protected void onPostExecute(Object o) {
-            Devices devices = (Devices)o;
+        public void run() {
+            System.out.println("-----Notified");
             LinearLayout layout = (LinearLayout) findViewById(R.id.deviceListView);
             ArrayList<Device> deviceList = devices.getDeviceList();
 
             if(!deviceList.isEmpty()){
-                for(Device d : devices.getDeviceList()){
+                for(Device d : deviceList){
                     Switch s = createSwitch(d);
                     layout.addView(s);
                 }
             }else{
                 showAlertMessage("No devices found!");
             }
-
         }
+    }
 
-        /**
-         * Creates custom switches
-         * @param deviceInformation - information about a device that this switch will control
-         * @return instance of created Switch
-         */
-        private Switch createSwitch(Device deviceInformation){
-            Switch s = new Switch(context);
-            setNonLayoutParams(s, deviceInformation);
-            setLayoutParams(s);
-            setEventListener(s);
+    /**
+     * Creates custom switches
+     * @param deviceInformation - information about a device that this switch will control
+     * @return instance of created Switch
+     */
+    private Switch createSwitch(Device deviceInformation){
+        Switch s = new Switch(this);
+        setNonLayoutParams(s, deviceInformation);
+        setLayoutParams(s);
+        setEventListener(s);
 
-            return s;
-        }
+        return s;
+    }
 
-        /**
-         * Sets functional parameters to the Switch - id, name, checked/unchecked
-         * @param s - Switch instance
-         * @param deviceInformation - DTO.Device information about the device
-         */
-        private void setNonLayoutParams(Switch s, Device deviceInformation){
-            s.setId(deviceInformation.getId());
-            s.setText(deviceInformation.getName());
-            s.setChecked(deviceInformation.getStatus());
-        }
+    /**
+     * Sets functional parameters to the Switch - id, name, checked/unchecked
+     * @param s - Switch instance
+     * @param deviceInformation - DTO.Device information about the device
+     */
+    private void setNonLayoutParams(Switch s, Device deviceInformation) {
+        s.setId(deviceInformation.getId());
+        s.setText(deviceInformation.getName());
+        s.setChecked(deviceInformation.getStatus());
+    }
 
-        /**
-         * Sets layout parameter to the Switch
-         * @param s - Switch instance
-         */
-        private void setLayoutParams(Switch s){
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            s.setLayoutParams(params);
-            s.setPadding(0, 30, 0, 30);
+    /**
+     * Sets layout parameter to the Switch
+     * @param s - Switch instance
+     */
+    private void setLayoutParams(Switch s){
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        s.setLayoutParams(params);
+        s.setPadding(0, 30, 0, 30);
 
-        }
+    }
 
-        /**
-         * Sets a listener on the Switch that will wait for user action on the Switch
-         * @param s - Switch instance
-         */
-        private void setEventListener(Switch s){
-            s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    new SwitchDevice(buttonView.getId()).execute();
-                }
-            });
-        }
+    /**
+     * Sets a listener on the Switch that will wait for user action on the Switch
+     * @param s - Switch instance
+     */
+    private void setEventListener(Switch s){
+        s.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                new SwitchDevice(buttonView.getId()).execute();
+            }
+        });
     }
 
     /**

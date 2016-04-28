@@ -22,9 +22,11 @@ import DTO.Schedule;
 import DTO.ScheduledEvent;
 import se.learning.home.androidclient.R;
 import se.learning.home.androidclient.controller.Controller;
+import se.learning.home.androidclient.interfaces.ScheduleObserver;
 
-public class ScheduleActivity extends CustomActivity {
+public class ScheduleActivity extends CustomActivity implements ScheduleObserver {
     private final Controller controller = super.getController();
+    private final ScheduleObserver scheduleObserver = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +34,18 @@ public class ScheduleActivity extends CustomActivity {
         setContentView(R.layout.activity_schedule);
 
         eventBttn();
+        showSchedule();
+    }
 
-        new ShowSchedule(this).execute();
-        /*ScheduleInformationBlock block = new ScheduleInformationBlock(1, "Test Device", "Device should be turned on", "2016-04-26 16:45", this);
-        scheduleLayout.addView(block.getScheduleBlock());*/
-
+    private void showSchedule(){
+        new AsyncTask(){
+            @Override
+            protected Object doInBackground(Object[] params) {
+                System.out.println("-----Schedule");
+                controller.requestScheduleFromServer(scheduleObserver);
+                return null;
+            }
+        }.execute();
     }
 
     private void eventBttn(){
@@ -49,6 +58,32 @@ public class ScheduleActivity extends CustomActivity {
                     startActivity(nextScreen);
                 }
             });
+        }
+    }
+
+    @Override
+    public void updateSchedule(Schedule schedule) {
+        System.out.println("----Notify schedule");
+        ScheduleActivity.this.runOnUiThread(new ShowSchedule(schedule, this));
+    }
+
+    private class ShowSchedule implements Runnable{
+        private Schedule schedule;
+        private Context context;
+
+        public ShowSchedule(Schedule schedule, Context context){
+            this.schedule = schedule;
+            this.context = context;
+        }
+
+        @Override
+        public void run() {
+            LinearLayout scheduleLayout = (LinearLayout) findViewById(R.id.scheduleLayout);
+            for(ScheduledEvent se : schedule.getSchedule()){
+                System.out.println(se.getDeviceName());
+                ScheduleInformationBlock block = new ScheduleInformationBlock(se.getDeviceID(), se.getDeviceName(), se.getScheduleDescription(), se.getScheduleDate(), context);
+                scheduleLayout.addView(block.getScheduleBlock());
+            }
         }
     }
 
@@ -110,31 +145,4 @@ public class ScheduleActivity extends CustomActivity {
             return scheduleBlock;
         }
     }
-
-    /**
-     * UI Thread to get and show schedule list
-     */
-    private class ShowSchedule extends AsyncTask{
-        private Context context;
-
-        public ShowSchedule(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Schedule doInBackground(Object[] params) {
-            return controller.getScheduleListFromServer();
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            LinearLayout scheduleLayout = (LinearLayout) findViewById(R.id.scheduleLayout);
-            Schedule schedule = (Schedule) o;
-            for(ScheduledEvent se : schedule.getSchedule()){
-                ScheduleInformationBlock block = new ScheduleInformationBlock(se.getDeviceID(), se.getDeviceName(), se.getScheduleDescription(), se.getScheduleDate(), context);
-                scheduleLayout.addView(block.getScheduleBlock());
-            }
-        }
-    }
-
 }

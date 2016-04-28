@@ -4,6 +4,8 @@ import DTO.Device;
 import DTO.Devices;
 import DTO.Schedule;
 import DTO.ServerData;
+import se.learning.home.androidclient.interfaces.DeviceListObserver;
+import se.learning.home.androidclient.interfaces.ScheduleObserver;
 import se.learning.home.androidclient.model.ConnectionToServer;
 
 /**
@@ -39,8 +41,9 @@ public final class Controller {
     /**
      * @return list of the devices from server
      */
-    public Devices getListOfDevices(){
-        return server.requestDeviceList();
+    public void requestListOfDevicesFromServer(DeviceListObserver observer){
+        server.addDeviceListObserver(observer);
+        server.requestDeviceList();
     }
 
     /**
@@ -60,5 +63,7 @@ public final class Controller {
         server.addNewDevice(device);
     }
 
-    public Schedule getScheduleListFromServer (){ return server.requestSchedule();}
+    public void requestScheduleFromServer (ScheduleObserver observer){
+        server.addScheduleObserver(observer);
+        server.requestSchedule();}
 }

@@ -5,6 +5,8 @@ import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.net.SocketFactory;
 
@@ -17,6 +19,7 @@ import DTO.Schedule;
 import DTO.ScheduledEvent;
 import DTO.ServerData;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
+import se.learning.home.androidclient.interfaces.ScheduleObserver;
 
 /**
  * Singleton class that handles connection and conversation with server
@@ -27,7 +30,8 @@ public final class ConnectionToServer implements Runnable{
     private Socket connection;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
-    private ArrayList<DeviceListObserver> observers = new ArrayList<>();
+    private ArrayList<DeviceListObserver> deviceListObservers = new ArrayList<>();
+    private ArrayList<ScheduleObserver> scheduleObservers = new ArrayList<>();
 
     private ConnectionToServer(){}
 
@@ -54,6 +58,7 @@ public final class ConnectionToServer implements Runnable{
         try{
             connectToServer();
             createIOStreams();
+            receiveServerMessages();
         }catch (Exception ex){
             System.err.println(ex.getMessage());
         }
@@ -95,13 +100,42 @@ public final class ConnectionToServer implements Runnable{
         return connection != null && outputStream != null && inputStream != null && connection.isConnected();
     }
 
-
-    public void addObserver(DeviceListObserver observer){
-        observers.add(observer);
+    /**
+     * This method adds new device list observer to list of devices observers
+     * @param observer - class that waits for device list
+     */
+    public void addDeviceListObserver(DeviceListObserver observer){
+        deviceListObservers.add(observer);
     }
 
-    private void notifyAllObservers(){
+    /**
+     * This method adds new schedule observer to list of schedule observers
+     * @param observer - class that waits for schedule
+     */
+    public void addScheduleObserver(ScheduleObserver observer){
+        scheduleObservers.add(observer);
+    }
 
+    /**
+     * This method gets called when new device list is available
+     * from server
+     * @param devices - devices from server
+     */
+    private void notifyAllDeviceListObservers(Devices devices){
+        for (DeviceListObserver DLO : deviceListObservers) {
+            DLO.updateDeviceList(devices);
+        }
+    }
+
+    /**
+     * This method gets called when new schedule is available
+     * from server
+     * @param schedule - schedule from server
+     */
+    private void notifyAllScheduleObservers(Schedule schedule){
+        for(ScheduleObserver SO : scheduleObservers){
+            SO.updateSchedule(schedule);
+        }
     }
 
 
@@ -117,10 +151,9 @@ public final class ConnectionToServer implements Runnable{
     /**
      * Creates request for getting list of connected devices
      */
-    public Devices requestDeviceList(){
+    public void requestDeviceList(){
         ClientServerTransferObject request = new GetDataRequest(GetDataRequest.RequestTypes.DEVICES);
         sendMessage(request);
-        return (Devices)getUserResponse();
     }
 
     /**
@@ -128,10 +161,9 @@ public final class ConnectionToServer implements Runnable{
      * @return DTO.Schedule that contains ScheduledEvent:s that containt schedule information for
      * each event
      */
-    public Schedule requestSchedule(){
+    public void requestSchedule(){
         ClientServerTransferObject request = new GetDataRequest(GetDataRequest.RequestTypes.SCHEDULE);
         sendMessage(request);
-        return (Schedule) getUserResponse();
     }
 
     /**
@@ -159,19 +191,40 @@ public final class ConnectionToServer implements Runnable{
     }
 
     /**
-     * Gets and returns user response
+     * Gets and returns server response
      * @return ClientServerTransferObject
      */
-    private ClientServerTransferObject getUserResponse(){
-        try {
-            ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
-            return response;
-        }catch (ClassNotFoundException cnfEx){
-            System.out.println("------- Don't understand what server tells me! -------------");
-        }catch (Exception ex){
-            ex.printStackTrace();
-            System.out.println("-----------Aaaaaaaa... Something really wrong!!!!");
+    private void receiveServerMessages(){
+        Executors.newSingleThreadExecutor().execute(new Runnable() {
+            @Override
+            public void run() {
+                while (true){
+                    try {
+                        System.out.println("Waiting...");
+                        ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
+                        System.out.println("Got something!");
+                        handleMessage(response);
+                    }catch (ClassNotFoundException cnfEx){
+                        System.out.println("------- Don't understand what server tells me! -------------");
+                    }catch (Exception ex){
+                        ex.printStackTrace();
+                        System.out.println("-----------Aaaaaaaa... Something really wrong!!!!");
+                    }
+                }
+            }
+        });
+    }
+
+    /**
+     * This method handles messages receive from server
+     * @param response - received response from server
+     */
+    private void handleMessage(ClientServerTransferObject response){
+        if(response instanceof Devices){
+            notifyAllDeviceListObservers((Devices)response);
+        }else if(response instanceof Schedule){
+            System.out.println("Received schedule");
+            notifyAllScheduleObservers((Schedule)response);
         }
-        return null;
     }
 }
