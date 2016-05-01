@@ -2,10 +2,8 @@ package se.learning.home.androidclient.model;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.net.SocketFactory;
@@ -17,7 +15,6 @@ import DTO.Devices;
 import DTO.GetDataRequest;
 import DTO.Schedule;
 import DTO.ScheduledEvent;
-import DTO.ServerData;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
 import se.learning.home.androidclient.interfaces.ScheduleObserver;
 
@@ -26,7 +23,9 @@ import se.learning.home.androidclient.interfaces.ScheduleObserver;
  */
 public final class ConnectionToServer implements Runnable{
     private static ConnectionToServer serverInstance = new ConnectionToServer();
-    private ServerData serverData;
+    //private final String serverIP = "130.237.238.42";
+    private final String serverIP = "10.0.2.2";
+    private final int portNr = 5821;
     private Socket connection;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
@@ -40,14 +39,6 @@ public final class ConnectionToServer implements Runnable{
      */
     public static ConnectionToServer getInstance(){
         return serverInstance;
-    }
-
-    /**
-     * Initializes server data
-     * @param serverData - DTO.ServerData that contains information for connection to a server
-     */
-    public void setServerData(ServerData serverData){
-        this.serverData = serverData;
     }
 
     /**
@@ -71,10 +62,7 @@ public final class ConnectionToServer implements Runnable{
     private void connectToServer() throws Exception{
         try{
             SocketFactory socketFactory = SocketFactory.getDefault();
-            connection = socketFactory.createSocket(serverData.getServerIP(), serverData.getPortNr());
-            System.out.println("----------Socket created!------------");
-        }catch (ConnectException conEx){
-            System.out.println("TIME OUT");
+            connection = socketFactory.createSocket(this.serverIP, this.portNr);
         }catch (Exception ex){
             throw new Exception(ex.getMessage());
         }
@@ -89,7 +77,6 @@ public final class ConnectionToServer implements Runnable{
         outputStream.flush();
 
         inputStream = new ObjectInputStream(connection.getInputStream());
-        System.out.println("----------IO Streams created!------------");
     }
 
     /**
@@ -175,6 +162,11 @@ public final class ConnectionToServer implements Runnable{
         sendMessage(request);
     }
 
+    public void addNewScheduledEvent(ScheduledEvent scheduledEvent){
+        ClientServerTransferObject request = scheduledEvent;
+        sendMessage(request);
+    }
+
     /**
      * Sends messages to server
      * @param request - request of type ClientServerTransferObject
@@ -183,10 +175,8 @@ public final class ConnectionToServer implements Runnable{
         try{
             outputStream.writeObject(request);
             outputStream.flush();
-            System.out.println("--------- Message sended");
         }catch (Exception ex){
             ex.printStackTrace();
-            System.err.println("----------ERROR SENDING !!!!!!!!!! ------------ :((((");
         }
     }
 
@@ -200,15 +190,12 @@ public final class ConnectionToServer implements Runnable{
             public void run() {
                 while (true){
                     try {
-                        System.out.println("Waiting...");
                         ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
-                        System.out.println("Got something!");
                         handleMessage(response);
                     }catch (ClassNotFoundException cnfEx){
                         System.out.println("------- Don't understand what server tells me! -------------");
                     }catch (Exception ex){
                         ex.printStackTrace();
-                        System.out.println("-----------Aaaaaaaa... Something really wrong!!!!");
                     }
                 }
             }
@@ -223,7 +210,6 @@ public final class ConnectionToServer implements Runnable{
         if(response instanceof Devices){
             notifyAllDeviceListObservers((Devices)response);
         }else if(response instanceof Schedule){
-            System.out.println("Received schedule");
             notifyAllScheduleObservers((Schedule)response);
         }
     }

@@ -1,10 +1,8 @@
 package se.learning.home.androidclient.view;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,18 +19,18 @@ import se.learning.home.androidclient.controller.Controller;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
 /**
- * Start activity of this app
- * Connects to server and creates list of switches to control
- * devices that are connected to server
+ * Start activity for this app
+ * This activity connects to server and displays device switches
+ * for all devices retrieved from server
  */
 public class HomeActivity extends CustomActivity implements DeviceListObserver{
     private final Controller controller = super.getController();
     private final DeviceListObserver deviceListObserver = this;
-    //private final String serverIP = "130.237.238.42";
-    private final String serverIP = "10.0.2.2";
 
     /**
      * Called when app is starting
+     * It creates buttons and requests server
+     * to subscribe this view as an observer for device list
      * @param savedInstanceState
      */
     @Override
@@ -40,13 +38,12 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        createExitButton();
-        createAddButton();
-        createScheduleButton();
+        createExitButtonListener();
+        createAddButtonListener();
+        createScheduleButtonListener();
 
         System.out.println("------Connecting...-------");
 
-        controller.connectToServer(new DTO.ServerData(serverIP, 5821));
         while(!controller.isConnectedToServer()){}
 
         showListOfDevices();
@@ -79,6 +76,10 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         }*/
     }
 
+    /**
+     * Calls server to subscribe this view as observer
+     * for device list and request first update immediately
+     */
     private void showListOfDevices(){
         new AsyncTask(){
             @Override
@@ -91,21 +92,25 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
     }
 
     /**
-     * Creates a button that will close application and sets a listener for user click
+     * Creates a button click listener for close app button
      */
-    private void createExitButton(){
+    private void createExitButtonListener(){
         final Button exitButton = (Button) findViewById(R.id.closeAppBttn);
-        assert exitButton != null;
-        exitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-                System.exit(0);
-            }
-        });
+        if (exitButton != null) {
+            exitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                    System.exit(0);
+                }
+            });
+        }
     }
 
-    private void createAddButton(){
+    /**
+     * Create a button click listener for add device button
+     */
+    private void createAddButtonListener(){
         final Button addButton = (Button) findViewById(R.id.addDeviceBttn);
         if (addButton != null) {
             addButton.setOnClickListener(new View.OnClickListener() {
@@ -118,7 +123,10 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         }
     }
 
-    private void createScheduleButton(){
+    /**
+     * Creates a button click listener for schedule button
+     */
+    private void createScheduleButtonListener(){
         final Button scheduleBttn = (Button) findViewById(R.id.scheduleBttn);
         if (scheduleBttn != null) {
             scheduleBttn.setOnClickListener(new View.OnClickListener() {
@@ -132,21 +140,37 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         }
     }
 
+    /**
+     * A DeviceListObserver notifier - this method gets called by model
+     * when new device list are received from server
+     * @param devices - devices received from server of type DTO.Devices
+     */
     @Override
     public void updateDeviceList(Devices devices) {
         HomeActivity.this.runOnUiThread(new ShowDevices(devices));
     }
 
+    /**
+     * This class will be run on an UI thread and it will add switches to the screen
+     * for each device received from server
+     */
     private class ShowDevices implements Runnable{
         private Devices devices;
 
+        /**
+         * Constructor initializes devices variable
+         * @param devices - DTO.Devices that comes from server
+         */
         public ShowDevices(Devices devices){
             this.devices = devices;
         }
 
+        /**
+         * The executor of this thread - creates necessary GUI elements and
+         * creates switches
+         */
         @Override
         public void run() {
-            System.out.println("-----Notified");
             LinearLayout layout = (LinearLayout) findViewById(R.id.deviceListView);
             ArrayList<Device> deviceList = devices.getDeviceList();
 
@@ -167,37 +191,10 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
      * @return instance of created Switch
      */
     private Switch createSwitch(Device deviceInformation){
-        Switch s = new Switch(this);
-        setNonLayoutParams(s, deviceInformation);
-        setLayoutParams(s);
+        Switch s = UIFactory.getInstance().createSwitch(deviceInformation, this);
         setEventListener(s);
 
         return s;
-    }
-
-    /**
-     * Sets functional parameters to the Switch - id, name, checked/unchecked
-     * @param s - Switch instance
-     * @param deviceInformation - DTO.Device information about the device
-     */
-    private void setNonLayoutParams(Switch s, Device deviceInformation) {
-        s.setId(deviceInformation.getId());
-        s.setText(deviceInformation.getName());
-        s.setChecked(deviceInformation.getStatus());
-    }
-
-    /**
-     * Sets layout parameter to the Switch
-     * @param s - Switch instance
-     */
-    private void setLayoutParams(Switch s){
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        s.setLayoutParams(params);
-        s.setPadding(0, 30, 0, 30);
-
     }
 
     /**
@@ -216,7 +213,7 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
     /**
      * This UI Thread that contacts server to change status(on/off) of a device
      */
-    private class SwitchDevice extends AsyncTask {
+    public class SwitchDevice extends AsyncTask {
         private int deviceId;
 
         /**

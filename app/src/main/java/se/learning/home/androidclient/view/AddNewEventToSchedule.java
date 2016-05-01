@@ -6,39 +6,103 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import DTO.Device;
+import DTO.Devices;
+import DTO.ScheduledEvent;
 import se.learning.home.androidclient.R;
+import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
-public class AddNewEventToSchedule extends CustomActivity {
-    private Device deviceChosen;
+/**
+ * This activity give user possibility to create new events
+ * and add them to the schedule
+ */
+public class AddNewEventToSchedule extends CustomActivity implements DeviceListObserver{
+    private DeviceSpinnerItem deviceChosen;
     private String dateChosen;
     private String timeChosen;
     private String deviceStatusChosen;
     private TextView date;
     private TextView time;
+    private ArrayList<DeviceSpinnerItem> deviceSpinnerItems = new ArrayList<>();
     private final int timePickerDialogId = 0;
     private final int datePickerDialogId = 1;
 
+    /**
+     * Runs when this activity is launched
+     * This method will register this activity as DeviceList observer and
+     * create all necessary
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_event);
 
-        //createDevicesSelector();
+        super.getController().requestListOfDevicesFromServer(this);
+        createDevicesSelector();
         createDateSelector();
         createTimeSelector();
         handleOnOffSpinner();
-        createSubmitBttn();
+        createSubmitBttnListener();
     }
 
+    /**
+     * This method is part of observable pattern - it gets called when new list of
+     * devices is received from server
+     * @param devices - list of devices that comes from server
+     */
+    @Override
+    public void updateDeviceList(Devices devices) {
+        deviceSpinnerItems = new ArrayList<>();
+
+        for(Device device : devices.getDeviceList()){
+            deviceSpinnerItems.add(new DeviceSpinnerItem(device.getId(), device.getName()));
+        }
+
+        createDevicesSelector();
+    }
+
+    /**
+     * Creates items for dropdown menu of devices and sets them to the dropdown menu
+     */
+    private void createDevicesSelector(){
+        Spinner devicesSpinner = (Spinner)findViewById(R.id.deviceListForScheduling);
+        ArrayAdapter<DeviceSpinnerItem> devicesSpinnerArrayAdapter = new ArrayAdapter<DeviceSpinnerItem>(this, android.R.layout.simple_spinner_item, deviceSpinnerItems);
+        devicesSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        devicesSpinner.setAdapter(devicesSpinnerArrayAdapter);
+
+        setDeviceSpinnerListener(devicesSpinner);
+    }
+
+    private void setDeviceSpinnerListener(Spinner deviceSpinner){
+        if (deviceSpinner != null) {
+            deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    deviceChosen = (DeviceSpinnerItem) parent.getItemAtPosition(position);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    deviceChosen = null;
+                }
+            });
+        }
+    }
+
+    /**
+     * Creates popup for time selection
+     */
     private void createTimeSelector(){
         time = (TextView)findViewById(R.id.timePicker);
         time.setOnClickListener(new View.OnClickListener() {
@@ -49,6 +113,9 @@ public class AddNewEventToSchedule extends CustomActivity {
         });
     }
 
+    /**
+     * Creates popp for date selection
+     */
     private void createDateSelector(){
         date = (TextView)findViewById(R.id.datePicker);
         date.setOnClickListener(new View.OnClickListener() {
@@ -59,6 +126,11 @@ public class AddNewEventToSchedule extends CustomActivity {
         });
     }
 
+    /**
+     *
+     * @param id - dialog id
+     * @return reference to dialog
+     */
     @Override
     protected Dialog onCreateDialog(int id){
         if(id == timePickerDialogId){
@@ -110,13 +182,44 @@ public class AddNewEventToSchedule extends CustomActivity {
         }
     }
 
-    private void createSubmitBttn(){
+    /**
+     * Creates submit button listener - when button is clicked then entered
+     * schedule data will be send to server
+     */
+    private void createSubmitBttnListener(){
         Button submitBttn = (Button)findViewById(R.id.submitNewEventBttn);
         submitBttn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Device: " + deviceChosen + "\nDate chosen: " + dateChosen + "\nTime chosen: " + timeChosen + "\nStatus chosen: " + deviceStatusChosen);
+                String dateTime = dateChosen + " " + timeChosen;
+
+                ScheduledEvent event = new ScheduledEvent(deviceChosen.getDeviceId(), deviceChosen.getDeviceName(), dateTime, deviceStatusChosen);
+                getController().addNewScheduledEventToServer(event);
             }
         });
+    }
+
+
+    private class DeviceSpinnerItem{
+        private int deviceId;
+        private String deviceName;
+
+        public DeviceSpinnerItem(int deviceId, String deviceName) {
+            this.deviceId = deviceId;
+            this.deviceName = deviceName;
+        }
+
+        public int getDeviceId() {
+            return deviceId;
+        }
+
+        public String getDeviceName() {
+            return deviceName;
+        }
+
+        @Override
+        public final String toString(){
+            return deviceName;
+        }
     }
 }

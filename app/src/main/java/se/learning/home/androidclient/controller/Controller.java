@@ -1,9 +1,7 @@
 package se.learning.home.androidclient.controller;
 
 import DTO.Device;
-import DTO.Devices;
-import DTO.Schedule;
-import DTO.ServerData;
+import DTO.ScheduledEvent;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
 import se.learning.home.androidclient.interfaces.ScheduleObserver;
 import se.learning.home.androidclient.model.ConnectionToServer;
@@ -14,14 +12,13 @@ import se.learning.home.androidclient.model.ConnectionToServer;
  * In this case we don't follow complete MVC pattern - se.learning.home.androidclient.view will have some logic
  */
 public final class Controller {
+    //private final String serverIP = "130.237.238.42";
     private final ConnectionToServer server = ConnectionToServer.getInstance();
 
     /**
      * This method tells ConnectionToServer object to establish connection
-     * @param serverData - data needed to establish connection with server
      */
-    public void connectToServer(ServerData serverData){
-        server.setServerData(serverData);
+    public Controller (){
         new Thread(server).start();
     }
 
@@ -63,7 +60,21 @@ public final class Controller {
         server.addNewDevice(device);
     }
 
+    /**
+     * Tells ConnectionToServer object to Subscribes new Schedule Observer and requests server
+     * for schedule list
+     * @param observer - reference to ScheduleObserver
+     */
     public void requestScheduleFromServer (ScheduleObserver observer){
         server.addScheduleObserver(observer);
-        server.requestSchedule();}
+        server.requestSchedule();
+    }
+
+    /**
+     * Requests ConnectionToServer to add new event to server
+     * @param scheduledEvent - event data
+     */
+    public void addNewScheduledEventToServer(ScheduledEvent scheduledEvent){
+        server.addNewScheduledEvent(scheduledEvent);
+    }
 }
