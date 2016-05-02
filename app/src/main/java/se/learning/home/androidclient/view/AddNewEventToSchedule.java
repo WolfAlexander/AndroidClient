@@ -25,6 +25,8 @@ import se.learning.home.androidclient.interfaces.DeviceListObserver;
 /**
  * This activity give user possibility to create new events
  * and add them to the schedule
+ * User should provide device whose status will be changed, time of the event,
+ * date of the event and new status of the device (on/off)
  */
 public class AddNewEventToSchedule extends CustomActivity implements DeviceListObserver{
     private DeviceSpinnerItem deviceChosen;
@@ -39,8 +41,8 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
 
     /**
      * Runs when this activity is launched
-     * This method will register this activity as DeviceList observer and
-     * create all necessary
+     * This method will register this activity as Device list observer, request Device list and
+     * create all necessary fields and buttons for user input
      * @param savedInstanceState
      */
     @Override
@@ -49,7 +51,7 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
         setContentView(R.layout.activity_add_new_event);
 
         super.getController().requestListOfDevicesFromServer(this);
-        createDevicesSelector();
+        createDeviceSelectors();
         createDateSelector();
         createTimeSelector();
         handleOnOffSpinner();
@@ -59,6 +61,7 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     /**
      * This method is part of observable pattern - it gets called when new list of
      * devices is received from server
+     * This method will receive
      * @param devices - list of devices that comes from server
      */
     @Override
@@ -69,13 +72,13 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
             deviceSpinnerItems.add(new DeviceSpinnerItem(device.getId(), device.getName()));
         }
 
-        createDevicesSelector();
+        createDeviceSelectors();
     }
 
     /**
      * Creates items for dropdown menu of devices and sets them to the dropdown menu
      */
-    private void createDevicesSelector(){
+    private void createDeviceSelectors(){
         Spinner devicesSpinner = (Spinner)findViewById(R.id.deviceListForScheduling);
         ArrayAdapter<DeviceSpinnerItem> devicesSpinnerArrayAdapter = new ArrayAdapter<DeviceSpinnerItem>(this, android.R.layout.simple_spinner_item, deviceSpinnerItems);
         devicesSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -84,6 +87,11 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
         setDeviceSpinnerListener(devicesSpinner);
     }
 
+    /**
+     * Sets a listener to device drop down chooser that will read
+     * value that user have chosen
+     * @param deviceSpinner
+     */
     private void setDeviceSpinnerListener(Spinner deviceSpinner){
         if (deviceSpinner != null) {
             deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -114,7 +122,7 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     }
 
     /**
-     * Creates popp for date selection
+     * Creates popup for date selection
      */
     private void createDateSelector(){
         date = (TextView)findViewById(R.id.datePicker);
@@ -127,7 +135,7 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     }
 
     /**
-     *
+     * Creates dialog depending on the dialog id entered as parameter
      * @param id - dialog id
      * @return reference to dialog
      */
@@ -146,6 +154,9 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
         return null;
     }
 
+    /**
+     * Listens for user time value chosen from time dialog popup
+     */
     private TimePickerDialog.OnTimeSetListener timePickerListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -154,6 +165,9 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
         }
     };
 
+    /**
+     * Listens for user time value chosen from date dialog popup
+     */
     private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
@@ -163,7 +177,7 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     };
 
     /**
-     * Handles on/off spinner by writing chosen item to field
+     * Handles user event on on/off drop down list by listening to value that user chose
      */
     private void handleOnOffSpinner() {
         Spinner onOffSpinner = (Spinner) findViewById(R.id.onOffSpinner);
@@ -200,6 +214,10 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     }
 
 
+    /**
+     * Custom device spinner(drop down list) item - it will contain device id number
+     * and device name with default constructor, getters and toString() representation
+     */
     private class DeviceSpinnerItem{
         private int deviceId;
         private String deviceName;

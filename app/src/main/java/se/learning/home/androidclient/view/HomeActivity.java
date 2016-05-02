@@ -19,9 +19,8 @@ import se.learning.home.androidclient.controller.Controller;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
 /**
- * Start activity for this app
- * This activity connects to server and displays device switches
- * for all devices retrieved from server
+ * Start activity of this app
+ * This activity displays device switches for all devices retrieved from server
  */
 public class HomeActivity extends CustomActivity implements DeviceListObserver{
     private final Controller controller = super.getController();

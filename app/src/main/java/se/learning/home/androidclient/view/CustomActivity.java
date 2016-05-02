@@ -36,5 +36,6 @@ public class CustomActivity extends AppCompatActivity{
 
         builder.create();
         builder.show();
+
     }
 }

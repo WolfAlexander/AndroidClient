@@ -12,7 +12,7 @@ import DTO.Device;
 import DTO.ScheduledEvent;
 
 /**
- * IN DEVELOPMENT - NOT READY TO BE USED!!!
+ * IN DEVELOPMENT - ALMOST READY!
  * This singleton factory is responsible for creating user interface objects
  * This factory now can create a switch
  */
@@ -125,7 +125,7 @@ public class UIFactory {
      */
     private void setDataToOuterBlock(LinearLayout block, ScheduledEvent data, Context context){
         TextView descriptionTextView = new TextView(context);
-        descriptionTextView.setText(data.getScheduleDescription());
+        descriptionTextView.setText(data.getNewDeviceStatus());
         block.addView(descriptionTextView);
     }
 }

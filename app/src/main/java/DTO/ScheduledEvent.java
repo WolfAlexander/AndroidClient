@@ -7,20 +7,20 @@ public final class ScheduledEvent extends ClientServerTransferObject{
     private int deviceID;
     private String deviceName;
     private String scheduleDate;
-    private String scheduleDescription;
+    private String newDeviceStatus;
 
     /**
      * Constructor initializes values
      * @param deviceID - int device id number
      * @param deviceName - String name of the device
      * @param scheduleDate - String representation of a date when event is scheduled to happen
-     * @param scheduleDescription - String representation ...
+     * @param newDeviceStatus - String representation ...
      */
-    public ScheduledEvent(int deviceID, String deviceName, String scheduleDate, String scheduleDescription) {
+    public ScheduledEvent(int deviceID, String deviceName, String scheduleDate, String newDeviceStatus) {
         this.deviceID = deviceID;
         this.deviceName = deviceName;
         this.scheduleDate = scheduleDate;
-        this.scheduleDescription = scheduleDescription;
+        this.newDeviceStatus = newDeviceStatus;
     }
 
     public int getDeviceID() {
@@ -47,11 +47,11 @@ public final class ScheduledEvent extends ClientServerTransferObject{
         this.scheduleDate = scheduleDate;
     }
 
-    public String getScheduleDescription() {
-        return scheduleDescription;
+    public String getNewDeviceStatus() {
+        return newDeviceStatus;
     }
 
-    public void setScheduleDescription(String scheduleDescription) {
-        this.scheduleDescription = scheduleDescription;
+    public void setNewDeviceStatus(String newDeviceStatus) {
+        this.newDeviceStatus = newDeviceStatus;
     }
 }
