@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -16,6 +15,7 @@ import DTO.Device;
 import DTO.Devices;
 import se.learning.home.androidclient.R;
 import se.learning.home.androidclient.controller.Controller;
+import se.learning.home.androidclient.factories.UIFactory;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
 /**
@@ -190,7 +190,7 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
      * @return instance of created Switch
      */
     private Switch createSwitch(Device deviceInformation){
-        Switch s = UIFactory.getInstance().createSwitch(deviceInformation, this);
+        Switch s = (Switch)UIFactory.getInstance().createSwitch(deviceInformation, this);
         setEventListener(s);
 
         return s;

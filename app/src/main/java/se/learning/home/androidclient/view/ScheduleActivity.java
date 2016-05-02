@@ -12,6 +12,7 @@ import DTO.Schedule;
 import DTO.ScheduledEvent;
 import se.learning.home.androidclient.R;
 import se.learning.home.androidclient.controller.Controller;
+import se.learning.home.androidclient.factories.UIFactory;
 import se.learning.home.androidclient.interfaces.ScheduleObserver;
 
 /**
@@ -96,7 +97,7 @@ public class ScheduleActivity extends CustomActivity implements ScheduleObserver
         public void run() {
             LinearLayout scheduleLayout = (LinearLayout) findViewById(R.id.scheduleLayout);
             for (ScheduledEvent se : schedule.getSchedule()) {
-                scheduleLayout.addView(UIFactory.getInstance().createScheduleBlock(se, context));
+                scheduleLayout.addView(UIFactory.getInstance().createScheduleEntryView(se, context));
             }
         }
     }

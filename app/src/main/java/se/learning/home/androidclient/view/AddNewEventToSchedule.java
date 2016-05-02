@@ -1,25 +1,21 @@
 package se.learning.home.androidclient.view;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.TimePicker;
-
 import java.util.ArrayList;
-import java.util.Calendar;
-
 import DTO.Device;
 import DTO.Devices;
 import DTO.ScheduledEvent;
 import se.learning.home.androidclient.R;
+import se.learning.home.androidclient.factories.UIFactory;
 import se.learning.home.androidclient.interfaces.DeviceListObserver;
 
 /**
@@ -30,14 +26,13 @@ import se.learning.home.androidclient.interfaces.DeviceListObserver;
  */
 public class AddNewEventToSchedule extends CustomActivity implements DeviceListObserver{
     private DeviceSpinnerItem deviceChosen;
-    private String dateChosen;
-    private String timeChosen;
+    private TextView startDatePicker;
+    private TextView startTimePicker;
+    private CheckBox endDataAvailableCheckbox;
+    private TextView endDatePicker;
+    private TextView endTimePicker;
     private String deviceStatusChosen;
-    private TextView date;
-    private TextView time;
     private ArrayList<DeviceSpinnerItem> deviceSpinnerItems = new ArrayList<>();
-    private final int timePickerDialogId = 0;
-    private final int datePickerDialogId = 1;
 
     /**
      * Runs when this activity is launched
@@ -51,10 +46,12 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
         setContentView(R.layout.activity_add_new_event);
 
         super.getController().requestListOfDevicesFromServer(this);
-        createDeviceSelectors();
-        createDateSelector();
-        createTimeSelector();
-        handleOnOffSpinner();
+
+        createStartDateInput();
+        createStartTimeInput();
+        handleEndDataCheckbox();
+        handleOnOffSelector();
+
         createSubmitBttnListener();
     }
 
@@ -72,13 +69,13 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
             deviceSpinnerItems.add(new DeviceSpinnerItem(device.getId(), device.getName()));
         }
 
-        createDeviceSelectors();
+        createDeviceSelector();
     }
 
     /**
      * Creates items for dropdown menu of devices and sets them to the dropdown menu
      */
-    private void createDeviceSelectors(){
+    private void createDeviceSelector(){
         Spinner devicesSpinner = (Spinner)findViewById(R.id.deviceListForScheduling);
         ArrayAdapter<DeviceSpinnerItem> devicesSpinnerArrayAdapter = new ArrayAdapter<DeviceSpinnerItem>(this, android.R.layout.simple_spinner_item, deviceSpinnerItems);
         devicesSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
@@ -109,77 +106,93 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     }
 
     /**
-     * Creates popup for time selection
+     * Creates and shows date picker for user
      */
-    private void createTimeSelector(){
-        time = (TextView)findViewById(R.id.timePicker);
-        time.setOnClickListener(new View.OnClickListener() {
+    private void createStartDateInput(){
+        startDatePicker = (TextView)findViewById(R.id.startDatePicker);
+        if (startDatePicker != null) {
+            startDatePicker.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UIFactory.getInstance().createDatePicker(startDatePicker).show(getSupportFragmentManager(), "datePicker");
+                }
+            });
+        }
+    }
+
+    /**
+     * Creates and shows time picker for user
+     */
+    private void createStartTimeInput(){
+        startTimePicker = (TextView)findViewById(R.id.startTimePicker);
+        if(startTimePicker != null){
+            startTimePicker.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    UIFactory.getInstance().createTimePicker(startTimePicker).show(getSupportFragmentManager(), "timePicker");
+                }
+            });
+        }
+    }
+
+    /**
+     * This method will handle checkbox events in this activity - if checkbox is checked then view for entering
+     * end date and time will be shown to the user, if not - end date and time view will be gone
+     */
+    private void handleEndDataCheckbox(){
+        endDataAvailableCheckbox = (CheckBox)findViewById(R.id.endDataCheckbox);
+        if (endDataAvailableCheckbox != null) {
+            endDataAvailableCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                LinearLayout endDateBlock = (LinearLayout) findViewById(R.id.endDateBlock);
+                LinearLayout endTimeBlock = (LinearLayout) findViewById(R.id.endTimeBlock);
+
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        endDateBlock.setVisibility(View.VISIBLE);
+                        endTimeBlock.setVisibility(View.VISIBLE);
+                        createEndTimeInput();
+                        createEndDateInput();
+                    } else {
+                        endDateBlock.setVisibility(View.GONE);
+                        endTimeBlock.setVisibility(View.GONE);
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Creates and shows time picker for user
+     */
+    private void createEndTimeInput(){
+        endDatePicker = (TextView)findViewById(R.id.endDatePicker);
+        endDatePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(0);
+                UIFactory.getInstance().createDatePicker(endDatePicker).show(getSupportFragmentManager(), "datePicker");
             }
         });
     }
 
     /**
-     * Creates popup for date selection
+     * Creates and shows date picker for user
      */
-    private void createDateSelector(){
-        date = (TextView)findViewById(R.id.datePicker);
-        date.setOnClickListener(new View.OnClickListener() {
+    private void createEndDateInput(){
+        endTimePicker = (TextView)findViewById(R.id.endTimePicker);
+        endTimePicker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialog(1);
+                UIFactory.getInstance().createTimePicker(endTimePicker).show(getSupportFragmentManager(), "timePicker");
             }
         });
     }
 
-    /**
-     * Creates dialog depending on the dialog id entered as parameter
-     * @param id - dialog id
-     * @return reference to dialog
-     */
-    @Override
-    protected Dialog onCreateDialog(int id){
-        if(id == timePickerDialogId){
-            return new TimePickerDialog(this, timePickerListener, 0, 0, true);
-        }else if(id == datePickerDialogId){
-            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-            int currentMonth = Calendar.getInstance().get(Calendar.MONTH);
-            int currentDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-
-            return new DatePickerDialog(this, datePickerListener, currentYear, currentMonth, currentDay);
-        }
-
-        return null;
-    }
-
-    /**
-     * Listens for user time value chosen from time dialog popup
-     */
-    private TimePickerDialog.OnTimeSetListener timePickerListener = new TimePickerDialog.OnTimeSetListener() {
-        @Override
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            timeChosen = hourOfDay + ":" + minute;
-            time.setText(timeChosen);
-        }
-    };
-
-    /**
-     * Listens for user time value chosen from date dialog popup
-     */
-    private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
-        @Override
-        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-            dateChosen = year + "-" + monthOfYear + "-" + dayOfMonth;
-            date.setText(dateChosen);
-        }
-    };
 
     /**
      * Handles user event on on/off drop down list by listening to value that user chose
      */
-    private void handleOnOffSpinner() {
+    private void handleOnOffSelector() {
         Spinner onOffSpinner = (Spinner) findViewById(R.id.onOffSpinner);
         if (onOffSpinner != null) {
             onOffSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -202,15 +215,22 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
      */
     private void createSubmitBttnListener(){
         Button submitBttn = (Button)findViewById(R.id.submitNewEventBttn);
-        submitBttn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String dateTime = dateChosen + " " + timeChosen;
+        if (submitBttn != null) {
+            submitBttn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String endTimeDate = null;
 
-                ScheduledEvent event = new ScheduledEvent(deviceChosen.getDeviceId(), deviceChosen.getDeviceName(), dateTime, deviceStatusChosen);
-                getController().addNewScheduledEventToServer(event);
-            }
-        });
+                    if(endTimePicker != null && endDatePicker != null && endDataAvailableCheckbox.isChecked())
+                        endTimeDate =  endTimePicker.getText().toString() + " " + endDatePicker.getText().toString();
+
+                    String startTimeDate = startDatePicker.getText() + " " + startTimePicker.getText();
+
+                    ScheduledEvent event = new ScheduledEvent(deviceChosen.getDeviceId(), deviceChosen.getDeviceName(), startTimeDate, endTimeDate, deviceStatusChosen);
+                    getController().addNewScheduledEventToServer(event);
+                }
+            });
+        }
     }
 
 
