@@ -92,7 +92,8 @@ public final class ConnectionToServer implements Runnable{
      * @param observer - class that waits for device list
      */
     public void addDeviceListObserver(DeviceListObserver observer){
-        deviceListObservers.add(observer);
+        if(observer != null)
+            deviceListObservers.add(observer);
     }
 
     /**
@@ -100,7 +101,8 @@ public final class ConnectionToServer implements Runnable{
      * @param observer - class that waits for schedule
      */
     public void addScheduleObserver(ScheduleObserver observer){
-        scheduleObservers.add(observer);
+        if(observer != null)
+            scheduleObservers.add(observer);
     }
 
     /**
