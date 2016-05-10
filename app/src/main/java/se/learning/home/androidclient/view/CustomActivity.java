@@ -8,6 +8,7 @@ import se.learning.home.androidclient.controller.Controller;
 
 /**
  * This class will be extended by all activities in this app
+ * This class contains controller reference and alert box functionality
  */
 public class CustomActivity extends AppCompatActivity{
     private final Controller controller = new Controller();
