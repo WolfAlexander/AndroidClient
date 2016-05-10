@@ -14,11 +14,24 @@ import se.learning.home.androidclient.model.ConnectionToServer;
 public final class Controller {
     //private final String serverIP = "130.237.238.42";
     private final ConnectionToServer server = ConnectionToServer.getInstance();
+    private static Controller  controller = new Controller();
 
     /**
      * This method tells ConnectionToServer object to establish connection
      */
-    public Controller (){
+    private Controller (){}
+
+    /**
+     * @return the only instance of this class
+     */
+    public static Controller getInstance(){
+        return controller;
+    }
+
+    /**
+     * This method tells ConnectionToServer object to establish connection
+     */
+    public void establishConnection(){
         new Thread(server).start();
     }
 
