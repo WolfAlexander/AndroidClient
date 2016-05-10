@@ -10,7 +10,7 @@ import se.learning.home.androidclient.controller.Controller;
  * This class will be extended by all activities in this app
  */
 public class CustomActivity extends AppCompatActivity{
-    private final Controller controller = new Controller();
+    private final Controller controller = Controller.getInstance();
 
     /**
      * @return Controller instance

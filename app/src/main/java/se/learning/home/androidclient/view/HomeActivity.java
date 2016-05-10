@@ -42,7 +42,7 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         createScheduleButtonListener();
 
         System.out.println("------Connecting...-------");
-
+        controller.establishConnection();
         while(!controller.isConnectedToServer()){}
 
         showListOfDevices();

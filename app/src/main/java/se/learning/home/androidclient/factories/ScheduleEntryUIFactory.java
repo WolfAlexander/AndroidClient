@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import DTO.ScheduledEvent;
 
 /**
@@ -28,66 +30,78 @@ public class ScheduleEntryUIFactory {
 
     /**
      * This method create new UI structure that will contain schedule event information
-     * @param scheduledEvent
-     * @param context
-     * @return
+     * @param scheduledEvent - data of the event
+     * @param context - UI context
+     * @return block that shows sheduled event data
      */
     public LinearLayout createScheduleBlock(ScheduledEvent scheduledEvent, Context context){
         LinearLayout scheduleBlock = createOuterParentBlock(context);
-        LinearLayout nameDateBlock = createInnerNameAndDateBlock(context);
-        setDataToInnerBlock(nameDateBlock, scheduledEvent, context);
-        scheduleBlock.addView(nameDateBlock);
-        setDataToOuterBlock(scheduleBlock, scheduledEvent, context);
+        TextView nameBlock = createInnerNameBlock(context, scheduledEvent);
+        TextView dateBlock = createInnerDateBlock(context, scheduledEvent);
+
+        scheduleBlock.addView(nameBlock);
+        scheduleBlock.addView(dateBlock);
+
+        setDeviceStatus(scheduleBlock, scheduledEvent, context);
 
         return scheduleBlock;
     }
 
-
-
     /**
-     * Creates
-     * @param context
-     * @return
+     * Creates layout which will show event data
+     * @param context - UI context
+     * @return layout to show scheduled event
      */
     private LinearLayout createOuterParentBlock(Context context){
         LinearLayout block = new LinearLayout(context);
         block.setOrientation(LinearLayout.VERTICAL);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(0, 20, 0, 0);
         block.setLayoutParams(params);
 
         return block;
     }
 
-    private LinearLayout createInnerNameAndDateBlock(Context context){
-        LinearLayout nameDateBlock = new LinearLayout(context);
-        nameDateBlock.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        nameDateBlock.setLayoutParams(params);
-
-        return nameDateBlock;
-    }
-
-    private void setDataToInnerBlock(LinearLayout nameDateBlock, ScheduledEvent data, Context context){
+    /**
+     * Creates a block that will contain device name inside outer schedule block
+     * @param context - UI context
+     * @param data - data of type ScheduledEvent that contains device name
+     * @return created block with device name
+     */
+    private TextView createInnerNameBlock(Context context, ScheduledEvent data){
         TextView deviceNameTextView = new TextView(context);
         deviceNameTextView.setText(data.getDeviceName());
-        deviceNameTextView.setTextColor(Color.BLACK);
-        deviceNameTextView.setShadowLayer(10, 0, 0, Color.WHITE);
-        nameDateBlock.addView(deviceNameTextView);
 
+        return deviceNameTextView;
+    }
+
+    /**
+     * Creates block and fills in date for event execution and if exists end date
+     * @param context - UI context
+     * @param data - data about the event that contains date data
+     * @return block with date
+     */
+    private TextView createInnerDateBlock(Context context, ScheduledEvent data){
         TextView scheduleDateTextView = new TextView(context);
-        scheduleDateTextView.setText(data.getEndDateTime());
-        scheduleDateTextView.setGravity(Gravity.RIGHT);
-        scheduleDateTextView.setTextColor(Color.WHITE);
-        scheduleDateTextView.setShadowLayer(10, 0, 0, Color.BLACK);
-        nameDateBlock.addView(scheduleDateTextView);
+        String dateTimeAsText;
+
+        if(data.getEndDateTime() != null)
+             dateTimeAsText = data.getStartDateTime() + " - " + data.getEndDateTime();
+        else
+            dateTimeAsText = data.getStartDateTime();
+
+        scheduleDateTextView.setText(dateTimeAsText);
+
+        return scheduleDateTextView;
     }
 
     /**
      * Sets description data to schedule block
      */
-    private void setDataToOuterBlock(LinearLayout block, ScheduledEvent data, Context context){
+    private void setDeviceStatus(LinearLayout block, ScheduledEvent data, Context context){
         TextView descriptionTextView = new TextView(context);
-        descriptionTextView.setText(data.getNewDeviceStatus());
+        String deviceText = "Device shall be: " + data.getNewDeviceStatus();
+        descriptionTextView.setText(deviceText);
         block.addView(descriptionTextView);
     }
 }

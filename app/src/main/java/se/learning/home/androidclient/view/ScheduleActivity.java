@@ -97,7 +97,9 @@ public class ScheduleActivity extends CustomActivity implements ScheduleObserver
         public void run() {
             LinearLayout scheduleLayout = (LinearLayout) findViewById(R.id.scheduleLayout);
             for (ScheduledEvent se : schedule.getSchedule()) {
-                scheduleLayout.addView(UIFactory.getInstance().createScheduleEntryView(se, context));
+                if (scheduleLayout != null) {
+                    scheduleLayout.addView(UIFactory.getInstance().createScheduleEntryView(se, context));
+                }
             }
         }
     }
