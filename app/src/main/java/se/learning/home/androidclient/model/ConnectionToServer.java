@@ -133,6 +133,7 @@ public final class ConnectionToServer implements Runnable{
      */
     public void switchDevice(int deviceID){
         ClientServerTransferObject request = new ControlDevice(deviceID);
+        request.setTransferType(ClientServerTransferObject.TransferType.CHANGE_DEVICE_STATUS);
         sendMessage(request);
     }
 
@@ -141,6 +142,7 @@ public final class ConnectionToServer implements Runnable{
      */
     public void requestDeviceList(){
         ClientServerTransferObject request = new GetDataRequest(GetDataRequest.RequestTypes.DEVICES);
+        request.setTransferType(ClientServerTransferObject.TransferType.GET);
         sendMessage(request);
     }
 
@@ -151,6 +153,7 @@ public final class ConnectionToServer implements Runnable{
      */
     public void requestSchedule(){
         ClientServerTransferObject request = new GetDataRequest(GetDataRequest.RequestTypes.SCHEDULE);
+        request.setTransferType(ClientServerTransferObject.TransferType.GET);
         sendMessage(request);
     }
 
@@ -160,11 +163,13 @@ public final class ConnectionToServer implements Runnable{
      */
     public void addNewDevice(Device device){
         ClientServerTransferObject request = device;
+        request.setTransferType(ClientServerTransferObject.TransferType.ADD_NEW_DEVICE);
         sendMessage(request);
     }
 
     public void addNewScheduledEvent(ScheduledEvent scheduledEvent){
         ClientServerTransferObject request = scheduledEvent;
+        request.setTransferType(ClientServerTransferObject.TransferType.ADD_NEW_SCHEDULED_EVENT);
         sendMessage(request);
     }
 
@@ -208,10 +213,16 @@ public final class ConnectionToServer implements Runnable{
      * @param response - received response from server
      */
     private void handleMessage(ClientServerTransferObject response){
-        if(response instanceof Devices){
-            notifyAllDeviceListObservers((Devices)response);
-        }else if(response instanceof Schedule){
-            notifyAllScheduleObservers((Schedule)response);
+        switch(response.getTransferType()){
+            case DEVICE_LIST_RESPONSE:
+                if(response instanceof Devices)
+                    notifyAllDeviceListObservers((Devices)response);
+            break;
+
+            case SCHEDULE_RESPONSE:
+                if(response instanceof Schedule)
+                    notifyAllScheduleObservers((Schedule)response);
+            break;
         }
     }
 }

@@ -96,6 +96,9 @@ public class ScheduleActivity extends CustomActivity implements ScheduleObserver
         @Override
         public void run() {
             LinearLayout scheduleLayout = (LinearLayout) findViewById(R.id.scheduleLayout);
+            if(scheduleLayout.getChildCount() > 0)
+                scheduleLayout.removeAllViews();
+
             for (ScheduledEvent se : schedule.getSchedule()) {
                 if (scheduleLayout != null) {
                     scheduleLayout.addView(UIFactory.getInstance().createScheduleEntryView(se, context));

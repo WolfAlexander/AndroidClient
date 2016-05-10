@@ -171,6 +171,8 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         @Override
         public void run() {
             LinearLayout layout = (LinearLayout) findViewById(R.id.deviceListView);
+            if(layout.getChildCount() > 0)
+                layout.removeAllViews();
             ArrayList<Device> deviceList = devices.getDeviceList();
 
             if(!deviceList.isEmpty()){
