@@ -5,6 +5,7 @@ package DTO;
  * PROBABLY WILL BE CHANGED!
  */
 public final class ScheduledEvent extends ClientServerTransferObject{
+    private static final long serialVersionUID = ClientServerTransferObject.serialVersionUID;
     private int deviceID;
     private String deviceName;
     private String startDateTime;

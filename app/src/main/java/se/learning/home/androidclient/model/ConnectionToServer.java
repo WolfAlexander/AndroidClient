@@ -1,5 +1,6 @@
 package se.learning.home.androidclient.model;
 
+import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -23,8 +24,8 @@ import se.learning.home.androidclient.interfaces.ScheduleObserver;
  */
 public final class ConnectionToServer implements Runnable{
     private static ConnectionToServer serverInstance = new ConnectionToServer();
-    //private final String serverIP = "130.237.238.42";
-    private final String serverIP = "10.0.2.2";
+    private final String serverIP = "130.237.238.42";
+    //private final String serverIP = "10.0.2.2";
     private final int portNr = 5821;
     private Socket connection;
     private ObjectOutputStream outputStream;
@@ -198,8 +199,10 @@ public final class ConnectionToServer implements Runnable{
                     try {
                         ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
                         handleMessage(response);
-                    }catch (ClassNotFoundException cnfEx){
+                    }catch (ClassNotFoundException cnfEx) {
                         System.out.println("------- Don't understand what server tells me! -------------");
+                    }catch(EOFException eofEx){
+                        System.out.print("Lost connection to server!");
                     }catch (Exception ex){
                         ex.printStackTrace();
                     }
