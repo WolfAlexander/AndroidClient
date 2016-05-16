@@ -1,5 +1,7 @@
 package se.learning.home.androidclient.view;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -33,7 +35,6 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
     private TextView endTimePicker;
     private String deviceStatusChosen;
     private ArrayList<DeviceSpinnerItem> deviceSpinnerItems = new ArrayList<>();
-
     /**
      * Runs when this activity is launched
      * This method will register this activity as Device list observer, request Device list and
@@ -69,39 +70,59 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
             deviceSpinnerItems.add(new DeviceSpinnerItem(device.getId(), device.getName()));
         }
 
-        createDeviceSelector();
+        AddNewEventToSchedule.this.runOnUiThread(new CreateDeviceSelector(this));
     }
 
     /**
-     * Creates items for dropdown menu of devices and sets them to the dropdown menu
+     * This class will be run on UI thread to create and show drop-down list of devices available for scheduling
      */
-    private void createDeviceSelector(){
-        Spinner devicesSpinner = (Spinner)findViewById(R.id.deviceListForScheduling);
-        ArrayAdapter<DeviceSpinnerItem> devicesSpinnerArrayAdapter = new ArrayAdapter<DeviceSpinnerItem>(this, android.R.layout.simple_spinner_item, deviceSpinnerItems);
-        devicesSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
-        devicesSpinner.setAdapter(devicesSpinnerArrayAdapter);
+    private class CreateDeviceSelector implements Runnable{
+        private Context context;
 
-        setDeviceSpinnerListener(devicesSpinner);
-    }
+        /**
+         * Constructor
+         * @param context - context of the activity where drop-down list
+         */
+        public CreateDeviceSelector(Context context){
+            this.context = context;
+        }
 
-    /**
-     * Sets a listener to device drop down chooser that will read
-     * value that user have chosen
-     * @param deviceSpinner
-     */
-    private void setDeviceSpinnerListener(Spinner deviceSpinner){
-        if (deviceSpinner != null) {
-            deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    deviceChosen = (DeviceSpinnerItem) parent.getItemAtPosition(position);
-                }
+        @Override
+        public void run() {
+            createDeviceSelector();
+        }
 
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                    deviceChosen = null;
-                }
-            });
+        /**
+         * Creates items for dropdown menu of devices and sets them to the dropdown menu
+         */
+        private void createDeviceSelector(){
+            Spinner devicesSpinner = (Spinner)findViewById(R.id.deviceListForScheduling);
+            ArrayAdapter<DeviceSpinnerItem> devicesSpinnerArrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, deviceSpinnerItems);
+            devicesSpinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+            devicesSpinner.setAdapter(devicesSpinnerArrayAdapter);
+
+            setDeviceSpinnerListener(devicesSpinner);
+        }
+
+        /**
+         * Sets a listener to device drop down chooser that will read
+         * value that user have chosen
+         * @param deviceSpinner
+         */
+        private void setDeviceSpinnerListener(Spinner deviceSpinner){
+            if (deviceSpinner != null) {
+                deviceSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        deviceChosen = (DeviceSpinnerItem) parent.getItemAtPosition(position);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        deviceChosen = null;
+                    }
+                });
+            }
         }
     }
 
