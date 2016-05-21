@@ -12,7 +12,6 @@ import se.learning.home.androidclient.model.ConnectionToServer;
  * In this case we don't follow complete MVC pattern - se.learning.home.androidclient.view will have some logic
  */
 public final class Controller {
-    //private final String serverIP = "130.237.238.42";
     private final ConnectionToServer server = ConnectionToServer.getInstance();
     private static Controller  controller = new Controller();
 

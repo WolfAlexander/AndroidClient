@@ -243,11 +243,12 @@ public class AddNewEventToSchedule extends CustomActivity implements DeviceListO
                     String endTimeDate = null;
 
                     if(endTimePicker != null && endDatePicker != null && endDataAvailableCheckbox.isChecked())
-                        endTimeDate =  endTimePicker.getText().toString() + " " + endDatePicker.getText().toString();
+                        endTimeDate = endDatePicker.getText().toString() + " " + endTimePicker.getText().toString();
 
-                    String startTimeDate = startDatePicker.getText() + " " + startTimePicker.getText();
+                    String startTimeDate = startDatePicker.getText().toString() + " " + startTimePicker.getText().toString();
 
                     ScheduledEvent event = new ScheduledEvent(deviceChosen.getDeviceId(), deviceChosen.getDeviceName(), startTimeDate, endTimeDate, deviceStatusChosen);
+                    //ScheduledEvent event = new ScheduledEvent(1, "Lamp_1", startTimeDate, endTimeDate, deviceStatusChosen);
                     getController().addNewScheduledEventToServer(event);
                 }
             });

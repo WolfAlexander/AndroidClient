@@ -52,7 +52,7 @@ public class DatePickerFactory extends DialogFragment implements DatePickerDialo
     @Override
     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
         if(output != null){
-            String chosenDate = year + "-" + monthOfYear + "-" + dayOfMonth;
+            String chosenDate = year + "-" + (++monthOfYear) + "-" + dayOfMonth;
             output.setText(chosenDate);
         }
 

@@ -46,33 +46,6 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         while(!controller.isConnectedToServer()){}
 
         showListOfDevices();
-
-
-        /*synchronized (this){
-            try {
-                int connectionTries = 0;
-                System.out.println("Waiting...");
-                this.wait(1000);
-                System.out.println("Waiting done!");
-
-                while (connectionTries != 5){
-                    System.out.println("Hellooooo! Its Ulrika ;)! Ulrika says: " + connectionTries);
-
-                    if(connectionTries == 4){
-                        super.showAlertMessage("Could not connect to server");
-                        System.exit(0);
-                    }else if (!controller.isConnectedToServer()) {
-                        connectionTries++;
-                        this.wait(3000);
-                    }else{
-                        System.out.println("--------Connected!---------");
-                        break;
-                    }
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }*/
     }
 
     /**
@@ -234,7 +207,6 @@ public class HomeActivity extends CustomActivity implements DeviceListObserver{
         @Override
         protected Object doInBackground(Object[] params) {
             controller.switchDeviceOnServer(deviceId);
-            System.out.println("Switching " + deviceId);
             return null;
         }
     }

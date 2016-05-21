@@ -1,11 +1,14 @@
 package se.learning.home.androidclient.model;
 
+
 import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.net.SocketFactory;
 
@@ -24,14 +27,14 @@ import se.learning.home.androidclient.interfaces.ScheduleObserver;
  */
 public final class ConnectionToServer implements Runnable{
     private static ConnectionToServer serverInstance = new ConnectionToServer();
-    //private final String serverIP = "130.237.238.42";
-    private final String serverIP = "10.0.2.2";
+    private final String serverIP = "130.237.238.42";
     private final int portNr = 5821;
     private Socket connection;
     private ObjectOutputStream outputStream;
     private ObjectInputStream inputStream;
     private ArrayList<DeviceListObserver> deviceListObservers = new ArrayList<>();
     private ArrayList<ScheduleObserver> scheduleObservers = new ArrayList<>();
+    private static final Logger log = Logger.getLogger("ConnectionToServerLogger11");
 
     private ConnectionToServer(){}
 
@@ -51,8 +54,9 @@ public final class ConnectionToServer implements Runnable{
             connectToServer();
             createIOStreams();
             receiveServerMessages();
+            log.log(Level.FINE, "Connection to server established!");
         }catch (Exception ex){
-            System.err.println(ex.getMessage());
+            log.log(Level.SEVERE, ex.toString(), ex);
         }
     }
 
@@ -195,18 +199,18 @@ public final class ConnectionToServer implements Runnable{
         Executors.newSingleThreadExecutor().execute(new Runnable() {
             @Override
             public void run() {
-                while (true){
-                    try {
-                        ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
-                        handleMessage(response);
-                    }catch (ClassNotFoundException cnfEx) {
-                        System.out.println("------- Don't understand what server tells me! -------------");
-                    }catch(EOFException eofEx){
-                        System.out.print("Lost connection to server!");
-                    }catch (Exception ex){
-                        ex.printStackTrace();
-                    }
+            while (true){
+                try {
+                    ClientServerTransferObject response = (ClientServerTransferObject)inputStream.readObject();
+                    handleMessage(response);
+                }catch (ClassNotFoundException cnfEx) {
+                    log.log(Level.SEVERE, cnfEx.toString(), cnfEx);
+                }catch(EOFException eofEx){
+                    log.log(Level.WARNING, "Lost connection to server!");
+                }catch (Exception ex){
+                    ex.printStackTrace();
                 }
+            }
             }
         });
     }
